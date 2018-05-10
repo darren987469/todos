@@ -15,3 +15,5 @@
  *= require_tree .
  *= require_self
  */
+
+.dd-handle { min-height: 40px; }
