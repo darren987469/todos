@@ -1,0 +1,5 @@
+<ul>
+  <% @todo_lists.each do |todo_list| %>
+    <li><%= link_to "todo_list #{todo_list.id}", todo_list_path(todo_list.id) %></li>
+  <% end %>
+</ul>

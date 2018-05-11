@@ -1,4 +1,4 @@
-class TodosContainer extends React.Component {
+class TodoListContainer extends React.Component {
   constructor(props){
     super(props)
     this.state = {
@@ -8,74 +8,143 @@ class TodosContainer extends React.Component {
         { id: 2, description: 'user1 complete todo1' }
       ]
     }
+    this.connected = this.connected.bind(this)
+    this.disconnected = this.disconnected.bind(this)
+    this.rejected = this.rejected.bind(this)
+    this.received = this.received.bind(this)
+
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
     this.deleteTodoRequest = this.deleteTodoRequest.bind(this)
     this.request = this.request.bind(this)
   }
 
-  createTodoRequest(description){
-    this.request(
-      { todo: { description: description }},
-      {
-        url: `/todo_lists/${this.props.todo_list_id}/todos`,
-        method: 'POST',
-        success: (res) => {
-          this.setState(prevState => {
-            return({ todos: prevState.todos.concat(res) })
-          })
-        }
+  componentDidMount(){
+    this.subscription = App.cable.subscriptions.create({
+      channel: 'TodoListChannel', id: this.props.todo_list_id
+    },
+    {
+      connected: this.connected,
+      disconnected: this.disconnected,
+      rejected: this.rejected,
+      received: this.received,
+    })
+  }
+
+  connected(){
+    console.log('connected')
+  }
+
+  disconnected(){
+    console.log('disconnected')
+  }
+
+  rejected(){
+    console.log('rejected')
+  }
+
+  received(data){
+    console.log('received data', data)
+    if(data.todo.errors){
+      console.error(data.todo.errors)
+      return
+    }
+    this.setState(prevState => {
+      var nextTodos
+      switch(data.method){
+        case 'post':
+          nextTodos = prevState.todos.concat(data.todo)
+          break
+        case 'patch':
+          nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
+          break
+        case 'delete':
+          nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
+          break
+        default:
+          console.error('error')
+          break
       }
-    )
+      nextTodos.sort((a, b) => a.id - b.id)
+      return({ todos: nextTodos })
+    })
+  }
+
+  createTodoRequest(description){
+    this.request('post', { todo: { description: description }})
+    /*
+      this.request(
+        { todo: { description: description }},
+        {
+          url: `/todo_lists/${this.props.todo_list_id}/todos`,
+          method: 'POST',
+          success: (res) => {
+            this.setState(prevState => {
+              return({ todos: prevState.todos.concat(res) })
+            })
+          }
+        }
+      )
+    */
   }
 
   patchTodoRequest(id, params, callback){
-    this.request(
-      { todo: params },
-      {
-        url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-        method: 'PATCH',
-        success: (res, textStatus, xhr) => {
-          if(xhr.status == 200){
-            this.setState(prevState => {
-              return({
-                todos: prevState.todos.map(todo =>
-                  todo.id === res.id ? res : todo
-                )
+    this.request('patch', { todo: Object.assign({ id: id }, params) })
+    /*
+      this.request(
+        { todo: params },
+        {
+          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
+          method: 'PATCH',
+          success: (res, textStatus, xhr) => {
+            if(xhr.status == 200){
+              this.setState(prevState => {
+                return({
+                  todos: prevState.todos.map(todo =>
+                    todo.id === res.id ? res : todo
+                  )
+                })
               })
-            })
+            }
+            if(callback)
+              callback(res, textStatus, xhr)
           }
-          if(callback)
-            callback(res, textStatus, xhr)
         }
-      }
-    )
+      )
+    */
   }
 
   deleteTodoRequest(id){
-    this.request(
-      {},
-      {
-        url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-        method: 'DELETE',
-        success: (res, textStatus, xhr) => {
-          if(xhr.status == 200){
-            this.setState(prevState => {
-              return({ todos: prevState.todos.filter(todo => todo.id !== res.id) })
-            })
+    this.request('delete', { todo: { id: id } })
+    /*
+      this.request(
+        {},
+        {
+          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
+          method: 'DELETE',
+          success: (res, textStatus, xhr) => {
+            if(xhr.status == 200){
+              this.setState(prevState => {
+                return({ todos: prevState.todos.filter(todo => todo.id !== res.id) })
+              })
+            }
           }
         }
-      }
-    )
+      )
+    */
   }
 
-  request(params, options = {}){
-    var defaultOptions = {
-      method: 'GET',
-      contentType: 'application/json',
-      data: JSON.stringify(params),
-    }
-    $.ajax({ ...defaultOptions, ...options })
+  request(method, params, options = {}){
+    console.log('rdata:', Object.assign({ todo_list_id: this.props.todo_list_id }, params))
+    this.subscription.perform(method, Object.assign({ todo_list_id: this.props.todo_list_id }, params))
+    /*
+      var defaultOptions = {
+        method: 'GET',
+        contentType: 'application/json',
+        data: JSON.stringify(params),
+      }
+      $.ajax({ ...defaultOptions, ...options })
+    */
   }
 
   render() {
@@ -98,15 +167,15 @@ class TodosContainer extends React.Component {
                   )
                 }
               </ol>
+              <div className="space-8"/>
               <form onSubmit={event => {
                 event.preventDefault()
                 this.createTodoRequest(this.newTodoDescriptionInput.value)
               }}>
                 <input type="text"
                   ref={el => this.newTodoDescriptionInput = el}
-                  style={{ marginRight: '5px' }}
+                  style={{ marginRight: '5px', width: '83%' }}
                   placeholder="Add Todo..."
-                  defaultValue="todo description"
                 />
                 <input type="submit" value="Add todo" className="btn btn-primary btn-sm" />
               </form>
@@ -160,11 +229,15 @@ class Todo extends React.Component {
     patchTodoRequest(
       todo.id,
       { description: this.state.description },
-      (res, textStatus, xhr) => {
-        if(xhr.status == 200)
-          this.setState({ mode: 'show' })
-      }
+      /* for ajax callback
+        (res, textStatus, xhr) => {
+          if(xhr.status == 200)
+            this.setState({ mode: 'show' })
+        }
+      */
     )
+    // for websocket callback
+    this.setState({ mode: 'show' })
   }
 
   renderShow(){
