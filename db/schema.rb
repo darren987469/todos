@@ -23,14 +23,17 @@ ActiveRecord::Schema.define(version: 2018_05_10_123506) do
   create_table "todos", force: :cascade do |t|
     t.bigint "todo_list_id"
     t.string "description"
-    t.boolean "complete"
+    t.boolean "complete", default: false
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["complete"], name: "index_todos_on_complete"
     t.index ["todo_list_id"], name: "index_todos_on_todo_list_id"
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "first_name", null: false
+    t.string "last_name", null: false
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
