@@ -4,7 +4,8 @@ class TodosController < ApplicationController
   def create
     @todo = Todo.new(todo_params.merge(todo_list_id: params[:todo_list_id]))
     if @todo.save
-      render json: @todo.to_json
+      ActionCable.server.broadcast 'todo_list', todo: @todo
+      render json: @todo
     else
       render json: { errors: @todo.errors.messages }, status: :bad_request
     end
@@ -13,7 +14,8 @@ class TodosController < ApplicationController
   def update
     @todo = Todo.find_by(todo_list_id: params[:todo_list_id], id: params[:id])
     if @todo.update(todo_params)
-      render json: @todo.to_json
+      ActionCable.server.broadcast 'todo_list', todo: @todo
+      render json: @todo
     else
       render json: { errors: @todo.errors.messages }, status: :bad_request
     end
@@ -22,7 +24,8 @@ class TodosController < ApplicationController
   def destroy
     @todo = Todo.find_by(todo_list_id: params[:todo_list_id], id: params[:id])
     if @todo.destroy
-      render json: @todo.to_json
+      ActionCable.server.broadcast 'todo_list', todo: @todo
+      render json: @todo
     else
       render json: { errors: @todo.errors.messages }, status: :bad_request
     end
