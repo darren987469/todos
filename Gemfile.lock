@@ -110,6 +110,8 @@ GEM
     mini_mime (1.0.0)
     mini_portile2 (2.3.0)
     minitest (5.11.3)
+    momentjs-rails (2.20.1)
+      railties (>= 3.1)
     msgpack (1.2.4)
     nio4r (2.3.1)
     nokogiri (1.8.2)
@@ -245,6 +247,7 @@ DEPENDENCIES
   factory_bot
   jquery-rails
   listen (>= 3.0.5, < 3.2)
+  momentjs-rails
   pg (>= 0.18, < 2.0)
   pry
   puma (~> 3.11)
