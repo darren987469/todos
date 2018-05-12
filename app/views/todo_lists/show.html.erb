@@ -1,6 +1,7 @@
 <%= javascript_include_tag 'cable' %>
 <%=
-  react_component('TodoListContainer',
+  react_component('TodoListsContainer',
+    todo_lists: @todo_lists,
     todo_list_id: @todo_list.id,
     todos: @todos,
     logs: @logs

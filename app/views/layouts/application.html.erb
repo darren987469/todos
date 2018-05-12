@@ -12,7 +12,7 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body>
+  <body class="no-skin">
     <div class="navbar navbar-default">
       <div class="navbar-header pull-left">
         <div class="navbar-brand">
@@ -67,6 +67,8 @@
     <% if alert %>
       <div class="alert alert-danger"><%= alert %></div>
     <% end %>
+
     <%= yield %>
+    </div>
   </body>
 </html>
