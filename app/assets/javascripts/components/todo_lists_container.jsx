@@ -13,6 +13,7 @@ class TodoListsContainer extends React.Component {
     this.received = this.received.bind(this)
     this.redirect = this.received.bind(this)
 
+    this.addMemberRequest = this.addMemberRequest.bind(this)
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
     this.destroyTodoRequest = this.destroyTodoRequest.bind(this)
@@ -57,6 +58,10 @@ class TodoListsContainer extends React.Component {
       case 'destroy_todo_list':
         window.location = '/todo_lists'
         return
+      case 'add_member':
+        alert(`Successful add member ${data.member.first_name} ${data.member.last_name}!`)
+        this.addMemberEmailInput.value = ''
+        return
     }
     this.setState(prevState => {
       var nextTodos
@@ -85,6 +90,10 @@ class TodoListsContainer extends React.Component {
 
       return({ todos: nextTodos, logs: nextLogs })
     })
+  }
+
+  addMemberRequest(email){
+    this.request('add_member', { id: this.state.currentTodoListId, email: email })
   }
 
   createTodoListRequest(){
@@ -262,6 +271,35 @@ class TodoListsContainer extends React.Component {
               </div>
 
               <div className="row">
+                <div className="col-sm-6">
+                  <div className="widget-box widget-color-blue">
+                    <div className="widget-header">
+                      <h4>Add member</h4>
+                    </div>
+                    <div className="widget-body">
+                      <div className="widget-main">
+                        <form onSubmit={e => {
+                          e.preventDefault()
+                          const email = this.addMemberEmailInput.value
+                          this.addMemberRequest(email)
+                        }}>
+                          Add a member to the todo list.
+                          <div className="input-group">
+                            <input type="email"
+                              ref={el => this.addMemberEmailInput = el}
+                              className="form-control"
+                              placeholder="Add member email..."
+                            />
+                            <span className="input-group-btn">
+                              <button className="btn btn-primary btn-sm">Add Member</button>
+                            </span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="col-sm-6">
                   <div className="widget-box widget-color-red2">
                     <div className="widget-header">

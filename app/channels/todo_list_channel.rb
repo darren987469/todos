@@ -4,10 +4,12 @@ class TodoListChannel < ApplicationCable::Channel
   class UnknownAction < StandardError; end
   class NotAuthorizedError < StandardError; end
 
-  VALID_ACTION = %w( create_todo_list update_todo_list destroy_todo_list create_todo update_todo destroy_todo )
+  VALID_ACTION = %w( add_member create_todo_list update_todo_list destroy_todo_list
+    create_todo update_todo destroy_todo )
 
   def subscribed
-    stream_from "todo_list_#{params[:id]}"
+    @stream_token = "todo_list_#{params[:id]}"
+    stream_from @stream_token
   end
 
   def request(data)
@@ -22,9 +24,27 @@ class TodoListChannel < ApplicationCable::Channel
     broadcast_errors(['Forbidden'])
   rescue StandardError => e
     broadcast_errors(['500 Error'])
+    raise if development?
   end
 
   private
+
+  def add_member
+    @todo_list = current_user.todo_lists.find(params[:id])
+    @member = User.find_by_email(params[:email])
+    raise ActiveRecord::RecordNotFound unless @member.present?
+
+    todo_listship = @todo_list.todo_listships.create(user: @member, role: :user)
+
+    create_log!(@todo_list) unless todo_listship.errors.blank?
+    ActionCable.server.broadcast(@stream_token,
+      action: @action,
+      member: @member,
+      log: @log,
+      errors: todo_listship.errors.messages.presence
+    )
+    clear_assigned_instance_variables!
+  end
 
   def create_todo_list
     ActiveRecord::Base.transaction do
@@ -82,7 +102,7 @@ class TodoListChannel < ApplicationCable::Channel
   end
 
   def broadcast(resource)
-    ActionCable.server.broadcast("todo_list_#{params[:todo_list_id]}",
+    ActionCable.server.broadcast(@stream_token,
       action: @action,
       todo_list: @todo_list,
       todo: @todo,
@@ -109,6 +129,8 @@ class TodoListChannel < ApplicationCable::Channel
 
     description =
       case @action
+      when 'add member'
+        'add a member to todo list'
       when 'create_todo_list'
         'create a todo list'
       when 'update_todo_list'
