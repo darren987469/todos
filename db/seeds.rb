@@ -14,6 +14,6 @@ User.create([
 todo_list1 = TodoList.create
 
 Todo.create([
-  { description: 'todo1', complete: false },
-  { description: 'todo1', complete: true }
+  { description: 'todo1', complete: false, todo_list: todo_list1 },
+  { description: 'todo1', complete: true, todo_list: todo_list1 }
 ])

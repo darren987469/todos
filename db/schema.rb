@@ -10,10 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_05_10_123506) do
+ActiveRecord::Schema.define(version: 2018_05_11_231240) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "event_logs", force: :cascade do |t|
+    t.string "resourceable_type"
+    t.bigint "resourceable_id"
+    t.bigint "user_id"
+    t.string "action"
+    t.string "description"
+    t.jsonb "variation"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resourceable_type", "resourceable_id"], name: "index_event_logs_on_resourceable_type_and_resourceable_id"
+    t.index ["user_id"], name: "index_event_logs_on_user_id"
+  end
 
   create_table "todo_lists", force: :cascade do |t|
     t.datetime "created_at", null: false
