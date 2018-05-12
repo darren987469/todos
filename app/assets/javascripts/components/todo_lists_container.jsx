@@ -1,7 +1,9 @@
-class TodoListContainer extends React.Component {
+class TodoListsContainer extends React.Component {
   constructor(props){
     super(props)
     this.state = {
+      todoLists: props.todo_lists,
+      currentTodoListId: props.todo_list_id,
       todos: props.todos,
       logs: props.logs,
     }
@@ -9,16 +11,19 @@ class TodoListContainer extends React.Component {
     this.disconnected = this.disconnected.bind(this)
     this.rejected = this.rejected.bind(this)
     this.received = this.received.bind(this)
+    this.redirect = this.received.bind(this)
 
+    this.addMemberRequest = this.addMemberRequest.bind(this)
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
-    this.deleteTodoRequest = this.deleteTodoRequest.bind(this)
+    this.destroyTodoRequest = this.destroyTodoRequest.bind(this)
     this.request = this.request.bind(this)
   }
 
   componentDidMount(){
+    console.log('componentDidMount')
     this.subscription = App.cable.subscriptions.create({
-      channel: 'TodoListChannel', id: this.props.todo_list_id
+      channel: 'TodoListChannel', id: this.state.currentTodoListId
     },
     {
       connected: this.connected,
@@ -42,24 +47,37 @@ class TodoListContainer extends React.Component {
 
   received(data){
     console.log('received data', data)
-    if(data.todo.errors){
+    if(data.errors){
       console.error(data.errors)
       return
+    }
+    switch(data.action){
+      case 'create_todo_list':
+        window.location = `/todo_lists/${data.todo_list.id}`
+        return
+      case 'destroy_todo_list':
+        window.location = '/todo_lists'
+        return
+      case 'add_member':
+        alert(`Successful add member ${data.member.first_name} ${data.member.last_name}!`)
+        this.addMemberEmailInput.value = ''
+        return
     }
     this.setState(prevState => {
       var nextTodos
       switch(data.action){
-        case 'create':
+        case 'create_todo':
           nextTodos = prevState.todos.concat(data.todo)
+          this.newTodoDescriptionInput.value = ''
           break
-        case 'update':
+        case 'update_todo':
           nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
           break
-        case 'destroy':
+        case 'destroy_todo':
           nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
           break
         default:
-          console.error('error')
+          console.error('unknown action')
           return
       }
       nextTodos.sort((a, b) => a.id - b.id)
@@ -67,14 +85,27 @@ class TodoListContainer extends React.Component {
       var nextLogs = prevState.logs
       if(data.log){
         nextLogs = nextLogs.concat(data.log)
+        nextLogs.sort((a, b) => b.id - a.id)
       }
 
       return({ todos: nextTodos, logs: nextLogs })
     })
   }
 
+  addMemberRequest(email){
+    this.request('add_member', { id: this.state.currentTodoListId, email: email })
+  }
+
+  createTodoListRequest(){
+    this.request('create_todo_list')
+  }
+
+  destroyTodoListRequest(id){
+    this.request('destroy_todo_list', { id: id })
+  }
+
   createTodoRequest(description){
-    this.request('create', { todo: { description: description }})
+    this.request('create_todo', { todo: { description: description }})
     /*
       this.request(
         { todo: { description: description }},
@@ -92,7 +123,7 @@ class TodoListContainer extends React.Component {
   }
 
   patchTodoRequest(id, params, callback){
-    this.request('update', { todo: Object.assign({ id: id }, params) })
+    this.request('update_todo', { todo: Object.assign({ id: id }, params) })
     /*
       this.request(
         { todo: params },
@@ -117,8 +148,8 @@ class TodoListContainer extends React.Component {
     */
   }
 
-  deleteTodoRequest(id){
-    this.request('destroy', { todo: { id: id } })
+  destroyTodoRequest(id){
+    this.request('destroy_todo', { todo: { id: id } })
     /*
       this.request(
         {},
@@ -137,9 +168,15 @@ class TodoListContainer extends React.Component {
     */
   }
 
-  request(method, params, options = {}){
-    console.log('rdata:', Object.assign({ todo_list_id: this.props.todo_list_id }, params))
-    this.subscription.perform(method, Object.assign({ todo_list_id: this.props.todo_list_id }, params))
+  request(method, params = {}, options = {}){
+    console.log('request method:', method)
+    const data = Object.assign(
+      { method: method },
+      { todo_list_id: this.props.todo_list_id },
+      params
+    )
+    console.log('request data:', data)
+    this.subscription.perform('request', data)
     /*
       var defaultOptions = {
         method: 'GET',
@@ -151,55 +188,134 @@ class TodoListContainer extends React.Component {
   }
 
   render() {
-    const { todos, logs } = this.state
-    const { createTodoRequest, patchTodoRequest, deleteTodoRequest } = this
+    const { currentTodoListId, todoLists, todos, logs } = this.state
+    const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
-      <div className="page-content">
-        <div className="row">
-          <div className="col-sm-6">
-            <div className="dd">
-              <form onSubmit={event => {
-                event.preventDefault()
-                this.createTodoRequest(this.newTodoDescriptionInput.value)
-              }}>
-                <div className="input-group">
-                  <input type="text"
-                    ref={el => this.newTodoDescriptionInput = el}
-                    className="form-control"
-                    placeholder="Add Todo..."
-                  />
-                  <span className="input-group-btn">
-                    <button className="btn btn-primary btn-sm">Add Todo</button>
-                  </span>
-                </div>
-              </form>
-              <div className="space-8"/>
-              <ol className="dd-list">
-                {
-                  todos.map(todo =>
-                    <Todo
-                      key={ todo.id }
-                      todo={ todo }
-                      patchTodoRequest={ patchTodoRequest }
-                      deleteTodoRequest={ deleteTodoRequest }
-                    />
-                  )
-                }
-              </ol>
-            </div>
-          </div>
+      <div className="main-container">
+        <div className="sidebar">
+          <ul className="nav nav-list">
+            {
+              todoLists.map(todoList =>
+                <li key={todoList.id} className={ todoList.id === currentTodoListId ? 'active' : ''}>
+                  <a href={`/todo_lists/${todoList.id}`}>
+                    <span className="menu-text">{ todoList.name }</span>
+                  </a>
+                </li>
+              )
+            }
+            <li>
+              <a
+                onClick={() => this.createTodoListRequest() }
+                style={{ cursor: 'pointer' }}
+              >
+                <span className="menu-text">Add List</span>
+                <b className="arrow fa fa-plus blue"/>
+              </a>
+            </li>
+          </ul>
 
-          <div className="col-sm-6">
-            <div className="widget-box transparent">
-              <div className="widget-header widget-header-small">
-                <h4 className="widget-title blue smaller">
-                  <i className="ace-icon fa fa-rss orange"/>
-                  Recent Activities
-                </h4>
+        </div>
+        <div className="main-content">
+          <div className="main-content-inner">
+            <div className="page-content">
+              <div className="row" style={{ height: '500px'}}>
+                <div className="col-sm-6">
+                  <div className="dd">
+                    <form onSubmit={event => {
+                      event.preventDefault()
+                      this.createTodoRequest(this.newTodoDescriptionInput.value)
+                    }}>
+                      <div className="input-group">
+                        <input type="text"
+                          ref={el => this.newTodoDescriptionInput = el}
+                          className="form-control"
+                          placeholder="Add Todo..."
+                        />
+                        <span className="input-group-btn">
+                          <button className="btn btn-primary btn-sm">Add Todo</button>
+                        </span>
+                      </div>
+                    </form>
+                    <div className="space-8"/>
+                    <ol className="dd-list">
+                      {
+                        todos.map(todo =>
+                          <Todo
+                            key={ todo.id }
+                            todo={ todo }
+                            patchTodoRequest={ patchTodoRequest }
+                            destroyTodoRequest={ destroyTodoRequest }
+                          />
+                        )
+                      }
+                    </ol>
+                  </div>
+                </div>
+
+                <div className="col-sm-6">
+                  <div className="widget-box transparent">
+                    <div className="widget-header widget-header-small">
+                      <h4 className="widget-title blue smaller">
+                        <i className="ace-icon fa fa-rss orange"/>
+                        Recent Activities
+                      </h4>
+                    </div>
+                    <div className="widget-body">
+                      <div className="widget-main padding-8" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                        { logs.map(log => <Log key={log.id} log={log}/>) }
+                      </div>
+                    </div>
+                    <p>Note: Hold a while to see detail tooltip.</p>
+                  </div>
+                </div>
               </div>
-              <div className="widget-body">
-                <div className="widget-main padding-8" style={{ maxHeight: '500px', overflowY: 'auto' }}>
-                  { logs.map(log => <Log key={log.id} log={log}/>) }
+
+              <div className="row">
+                <div className="col-sm-6">
+                  <div className="widget-box widget-color-blue">
+                    <div className="widget-header">
+                      <h4>Add member</h4>
+                    </div>
+                    <div className="widget-body">
+                      <div className="widget-main">
+                        <form onSubmit={e => {
+                          e.preventDefault()
+                          const email = this.addMemberEmailInput.value
+                          this.addMemberRequest(email)
+                        }}>
+                          Add a member to the todo list.
+                          <div className="input-group">
+                            <input type="email"
+                              ref={el => this.addMemberEmailInput = el}
+                              className="form-control"
+                              placeholder="Add member email..."
+                            />
+                            <span className="input-group-btn">
+                              <button className="btn btn-primary btn-sm">Add Member</button>
+                            </span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-sm-6">
+                  <div className="widget-box widget-color-red2">
+                    <div className="widget-header">
+                      <h4>Danger Zone</h4>
+                    </div>
+                    <div className="widget-body">
+                      <div className="widget-main">
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => this.destroyTodoListRequest(currentTodoListId)}
+                        >
+                          Delete this todo list
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -210,8 +326,8 @@ class TodoListContainer extends React.Component {
   }
 }
 
-TodoListContainer.propTypes = {
-  todo_list_id: PropTypes.number.isRequired,
+TodoListsContainer.propTypes = {
+  todo_list_id: PropTypes.number,
   todos: PropTypes.array.isRequired,
   logs: PropTypes.array.isRequired
 }
@@ -247,7 +363,7 @@ class Todo extends React.Component {
   }
 
   renderShow(){
-    const { todo, patchTodoRequest, deleteTodoRequest } = this.props
+    const { todo, patchTodoRequest, destroyTodoRequest } = this.props
     return(
       <li className="dd-item">
         <div className="dd-handle">
@@ -271,7 +387,7 @@ class Todo extends React.Component {
                 <i className="ace-icon fa fa-pencil bigger-150"></i>
               </a>
             }
-            <a className="red" onClick={() => deleteTodoRequest(todo.id)}>
+            <a className="red" onClick={() => destroyTodoRequest(todo.id)}>
               <i className="ace-icon fa fa-trash-o bigger-150"></i>
             </a>
           </div>
@@ -281,7 +397,7 @@ class Todo extends React.Component {
   }
 
   renderEdit(){
-    const { todo, patchTodoRequest, deleteTodoRequest } = this.props
+    const { todo, patchTodoRequest, destroyTodoRequest } = this.props
     return(
       <li className="dd-item">
         <div className="dd-handle">
@@ -299,6 +415,7 @@ class Todo extends React.Component {
           </label>
           <input
             type="text"
+            className="input-xlarge"
             value={this.state.description}
             onChange={event => this.setState({ description: event.target.value })}
           />
@@ -348,7 +465,7 @@ class Log extends React.Component{
 
   renderDetail(log) {
     const changes = log.variation
-    return `id: ${log.id}` + (changes ?
+    return `id: ${log.resourceable_id}` + (changes ?
       ', ' + Object.keys(changes).map(attribute => `${attribute}: ${changes[attribute][0]} => ${changes[attribute][1]}`).join(', ') : '')
   }
 
@@ -362,8 +479,7 @@ class Log extends React.Component{
           <a>
             {
               log.variation ?
-              <span title={this.renderDetail(log)}> Detail </span> :
-              <span> Detail </span>
+              <span title={this.renderDetail(log)}> Detail </span> : ''
             }
             {/* <b className="arrow fa fa-angle-down"></b> */}
           </a>
