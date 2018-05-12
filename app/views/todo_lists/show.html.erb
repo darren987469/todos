@@ -2,7 +2,7 @@
 <%=
   react_component('TodoListContainer',
     todo_list_id: @todo_list.id,
-    todos: @todo_list.todos.order(id: :asc),
-    logs: []
+    todos: @todos,
+    logs: @logs
   )
 %>
