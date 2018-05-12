@@ -51,6 +51,7 @@ class TodoListContainer extends React.Component {
       switch(data.action){
         case 'create':
           nextTodos = prevState.todos.concat(data.todo)
+          this.newTodoDescriptionInput.value = ''
           break
         case 'update':
           nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
@@ -67,6 +68,7 @@ class TodoListContainer extends React.Component {
       var nextLogs = prevState.logs
       if(data.log){
         nextLogs = nextLogs.concat(data.log)
+        nextLogs.sort((a, b) => b.id - a.id)
       }
 
       return({ todos: nextTodos, logs: nextLogs })
@@ -202,6 +204,7 @@ class TodoListContainer extends React.Component {
                   { logs.map(log => <Log key={log.id} log={log}/>) }
                 </div>
               </div>
+              <p>Note: Hold a while to see detail tooltip.</p>
             </div>
           </div>
         </div>
@@ -299,6 +302,7 @@ class Todo extends React.Component {
           </label>
           <input
             type="text"
+            className="input-xlarge"
             value={this.state.description}
             onChange={event => this.setState({ description: event.target.value })}
           />
@@ -348,7 +352,7 @@ class Log extends React.Component{
 
   renderDetail(log) {
     const changes = log.variation
-    return `id: ${log.id}` + (changes ?
+    return `id: ${log.resourceable_id}` + (changes ?
       ', ' + Object.keys(changes).map(attribute => `${attribute}: ${changes[attribute][0]} => ${changes[attribute][1]}`).join(', ') : '')
   }
 
@@ -362,8 +366,7 @@ class Log extends React.Component{
           <a>
             {
               log.variation ?
-              <span title={this.renderDetail(log)}> Detail </span> :
-              <span> Detail </span>
+              <span title={this.renderDetail(log)}> Detail </span> : ''
             }
             {/* <b className="arrow fa fa-angle-down"></b> */}
           </a>
