@@ -325,8 +325,11 @@ class Todo extends React.Component {
 class Log extends React.Component{
   constructor(props){
     super(props)
-    this.state = { created_at:  this.formatCreatedAt() }
+    this.state = {
+      created_at: this.formatCreatedAt(),
+    }
   }
+
   componentDidMount(){
     this.timerId = setInterval(() => this.tick(), 1000)
   }
@@ -343,15 +346,27 @@ class Log extends React.Component{
     return(moment(this.props.log.created_at).fromNow())
   }
 
+  renderDetail(log) {
+    const changes = log.variation
+    return `id: ${log.id}` + (changes ?
+      ', ' + Object.keys(changes).map(attribute => `${attribute}: ${changes[attribute][0]} => ${changes[attribute][1]}`).join(', ') : '')
+  }
+
   render(){
     const { log } = this.props
+    const { showDetail } = this.state
     return(
       <div className="profile-activity clearfix">
         <div>
-          {/* <a className="user" href={`/users/${user.id}`}>
-            { user.name }
-          </a> */}
           { log.description }
+          <a>
+            {
+              log.variation ?
+              <span title={this.renderDetail(log)}> Detail </span> :
+              <span> Detail </span>
+            }
+            {/* <b className="arrow fa fa-angle-down"></b> */}
+          </a>
 
           <div className="time">
             <i className="ace-icon fa fa-clock-o bigger-110" style={{ marginRight: '5px' }}/>

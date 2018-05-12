@@ -59,7 +59,7 @@ class TodoListChannel < ApplicationCable::Channel
         resourceable: @todo,
         user: current_user,
         action: @action,
-        description: "#{current_user.name} #{@action} a todo",
+        description: "#{current_user.name} #{@action} a todo.",
         variation: options[:changes]
       )
     end
