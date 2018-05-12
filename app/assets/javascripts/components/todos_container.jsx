@@ -3,10 +3,7 @@ class TodoListContainer extends React.Component {
     super(props)
     this.state = {
       todos: props.todos,
-      logs: [
-        { id: 1, description: 'user1 create todo1' },
-        { id: 2, description: 'user1 complete todo1' }
-      ]
+      logs: props.logs,
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -46,32 +43,38 @@ class TodoListContainer extends React.Component {
   received(data){
     console.log('received data', data)
     if(data.todo.errors){
-      console.error(data.todo.errors)
+      console.error(data.errors)
       return
     }
     this.setState(prevState => {
       var nextTodos
-      switch(data.method){
-        case 'post':
+      switch(data.action){
+        case 'create':
           nextTodos = prevState.todos.concat(data.todo)
           break
-        case 'patch':
+        case 'update':
           nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
           break
-        case 'delete':
+        case 'destroy':
           nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
           break
         default:
           console.error('error')
-          break
+          return
       }
       nextTodos.sort((a, b) => a.id - b.id)
-      return({ todos: nextTodos })
+
+      var nextLogs = prevState.logs
+      if(data.log){
+        nextLogs = nextLogs.concat(data.log)
+      }
+
+      return({ todos: nextTodos, logs: nextLogs })
     })
   }
 
   createTodoRequest(description){
-    this.request('post', { todo: { description: description }})
+    this.request('create', { todo: { description: description }})
     /*
       this.request(
         { todo: { description: description }},
@@ -89,7 +92,7 @@ class TodoListContainer extends React.Component {
   }
 
   patchTodoRequest(id, params, callback){
-    this.request('patch', { todo: Object.assign({ id: id }, params) })
+    this.request('update', { todo: Object.assign({ id: id }, params) })
     /*
       this.request(
         { todo: params },
@@ -115,7 +118,7 @@ class TodoListContainer extends React.Component {
   }
 
   deleteTodoRequest(id){
-    this.request('delete', { todo: { id: id } })
+    this.request('destroy', { todo: { id: id } })
     /*
       this.request(
         {},
@@ -148,13 +151,29 @@ class TodoListContainer extends React.Component {
   }
 
   render() {
-    const { todos } = this.state
+    const { todos, logs } = this.state
     const { createTodoRequest, patchTodoRequest, deleteTodoRequest } = this
     return(
       <div className="page-content">
         <div className="row">
           <div className="col-sm-6">
             <div className="dd">
+              <form onSubmit={event => {
+                event.preventDefault()
+                this.createTodoRequest(this.newTodoDescriptionInput.value)
+              }}>
+                <div className="input-group">
+                  <input type="text"
+                    ref={el => this.newTodoDescriptionInput = el}
+                    className="form-control"
+                    placeholder="Add Todo..."
+                  />
+                  <span className="input-group-btn">
+                    <button className="btn btn-primary btn-sm">Add Todo</button>
+                  </span>
+                </div>
+              </form>
+              <div className="space-8"/>
               <ol className="dd-list">
                 {
                   todos.map(todo =>
@@ -167,18 +186,6 @@ class TodoListContainer extends React.Component {
                   )
                 }
               </ol>
-              <div className="space-8"/>
-              <form onSubmit={event => {
-                event.preventDefault()
-                this.createTodoRequest(this.newTodoDescriptionInput.value)
-              }}>
-                <input type="text"
-                  ref={el => this.newTodoDescriptionInput = el}
-                  style={{ marginRight: '5px', width: '83%' }}
-                  placeholder="Add Todo..."
-                />
-                <input type="submit" value="Add todo" className="btn btn-primary btn-sm" />
-              </form>
             </div>
           </div>
 
@@ -191,15 +198,8 @@ class TodoListContainer extends React.Component {
                 </h4>
               </div>
               <div className="widget-body">
-                <div className="widget-main padding-8">
-                  <div className="profile-feed ace-scroll" style={{ position: 'relative' }}>
-                    <div className="scroll-track scroll-active" style={{ display: 'block', height: '200px'}}>
-                      <div className="scroll-bar" style={{ height: '63px', top: '77px' }}/>
-                    </div>
-                    <div className="scroll-content" style={{ maxHeight: '200px' }}>
-                      { Array.from(Array(30).keys()).map(x => <Log key={x}/>) }
-                    </div>
-                  </div>
+                <div className="widget-main padding-8" style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                  { logs.map(log => <Log key={log.id} log={log}/>) }
                 </div>
               </div>
             </div>
@@ -208,6 +208,12 @@ class TodoListContainer extends React.Component {
       </div>
     )
   }
+}
+
+TodoListContainer.propTypes = {
+  todo_list_id: PropTypes.number.isRequired,
+  todos: PropTypes.array.isRequired,
+  logs: PropTypes.array.isRequired
 }
 
 class Todo extends React.Component {
@@ -317,16 +323,18 @@ class Todo extends React.Component {
 }
 
 const Log = (props) => {
+  const { log } = props
   return(
     <div className="profile-activity clearfix">
       <div>
-        <a className="user" href="#"> Alex Doe </a>
-        changed his profile photo.
-        <a href="#">Take a look</a>
+        {/* <a className="user" href={`/users/${user.id}`}>
+          { user.name }
+        </a> */}
+        { log.description }
 
         <div className="time">
           <i className="ace-icon fa fa-clock-o bigger-110"/>
-          an hour ago
+          { log.created_at }
         </div>
       </div>
     </div>

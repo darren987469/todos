@@ -5,3 +5,15 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
+
+User.create([
+  { first_name: 'Darren', last_name: 'Chang', email: 'darren.chang@gmail.com', password: '666666' },
+  { first_name: 'Darren', last_name: 'Handsome', email: 'darren.handsome@gmail.com', password: '666666' }
+])
+
+todo_list1 = TodoList.create
+
+Todo.create([
+  { description: 'todo1', complete: false, todo_list: todo_list1 },
+  { description: 'todo1', complete: true, todo_list: todo_list1 }
+])

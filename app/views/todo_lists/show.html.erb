@@ -1,2 +1,8 @@
 <%= javascript_include_tag 'cable' %>
-<%= react_component('TodoListContainer', todos: @todo_list.todos.order(id: :asc), todo_list_id: @todo_list.id) %>
+<%=
+  react_component('TodoListContainer',
+    todo_list_id: @todo_list.id,
+    todos: @todos,
+    logs: @logs
+  )
+%>
