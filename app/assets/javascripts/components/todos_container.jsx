@@ -3,10 +3,7 @@ class TodoListContainer extends React.Component {
     super(props)
     this.state = {
       todos: props.todos,
-      logs: [
-        { id: 1, description: 'user1 create todo1' },
-        { id: 2, description: 'user1 complete todo1' }
-      ]
+      logs: props.logs,
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -155,6 +152,22 @@ class TodoListContainer extends React.Component {
         <div className="row">
           <div className="col-sm-6">
             <div className="dd">
+              <form onSubmit={event => {
+                event.preventDefault()
+                this.createTodoRequest(this.newTodoDescriptionInput.value)
+              }}>
+                <div className="input-group">
+                  <input type="text"
+                    ref={el => this.newTodoDescriptionInput = el}
+                    className="form-control"
+                    placeholder="Add Todo..."
+                  />
+                  <span className="input-group-btn">
+                    <button className="btn btn-primary btn-sm">Add Todo</button>
+                  </span>
+                </div>
+              </form>
+              <div className="space-8"/>
               <ol className="dd-list">
                 {
                   todos.map(todo =>
@@ -167,18 +180,6 @@ class TodoListContainer extends React.Component {
                   )
                 }
               </ol>
-              <div className="space-8"/>
-              <form onSubmit={event => {
-                event.preventDefault()
-                this.createTodoRequest(this.newTodoDescriptionInput.value)
-              }}>
-                <input type="text"
-                  ref={el => this.newTodoDescriptionInput = el}
-                  style={{ marginRight: '5px', width: '83%' }}
-                  placeholder="Add Todo..."
-                />
-                <input type="submit" value="Add todo" className="btn btn-primary btn-sm" />
-              </form>
             </div>
           </div>
 
@@ -208,6 +209,12 @@ class TodoListContainer extends React.Component {
       </div>
     )
   }
+}
+
+TodoListContainer.propTypes = {
+  todo_list_id: PropTypes.number.isRequired,
+  todos: PropTypes.array.isRequired,
+  logs: PropTypes.array.isRequired
 }
 
 class Todo extends React.Component {
