@@ -29,10 +29,19 @@ class TodoListsController < ApplicationController
     current_user_role = current_user.role_of(@todo_list)
     unless (current_user_role.owner? || current_user_role.admin?)
       flash[:alert] = 'You cannot update this todo list.'
-      return redirect_to todo_list_path(@todo_list)
+      return redirect_to edit_todo_list_path(@todo_list)
     end
 
     @todo_list.update!(todo_list_params)
+
+    @log = EventLogger.log(
+      resource: @todo_list,
+      user: current_user,
+      action: :update,
+      changes: @todo_list.previous_changes.except(:updated_at)
+    )
+    ActionCable.server.broadcast(@todo_list.log_tag, action: 'update_todo_list')
+
     flash[:notice] = 'Name is updated!'
     redirect_to edit_todo_list_path(@todo_list)
   end
@@ -46,6 +55,13 @@ class TodoListsController < ApplicationController
     end
 
     @todo_list.destroy!
+    @log = EventLogger.log(
+      resource: @todo_list,
+      user: current_user,
+      action: :destroy,
+    )
+    ActionCable.server.broadcast(@todo_list.log_tag, action: 'update_todo_list')
+
     flash[:notice] = "List #{@todo_list.name} is deleted!"
     redirect_to todo_lists_path
   end

@@ -42,11 +42,6 @@ class TodoListChannel < ApplicationCable::Channel
     broadcast(@todo_list)
   end
 
-  def update_todo_list
-    raise NotImplementedError
-    @action = 'update_todo_list'
-  end
-
   def destroy_todo_list
     @todo_list = current_user.todo_lists.find(params[:id])
     raise NotAuthorizedError unless @todo_list.owner == current_user

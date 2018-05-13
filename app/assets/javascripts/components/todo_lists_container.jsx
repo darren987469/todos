@@ -14,6 +14,8 @@ class TodoListsContainer extends React.Component {
     this.received = this.received.bind(this)
     this.redirect = this.received.bind(this)
     this.nextLogsState = this.nextLogsState.bind(this)
+    this.toTop = this.toTop.bind(this)
+    this.showError = this.showError.bind(this)
 
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
@@ -49,17 +51,46 @@ class TodoListsContainer extends React.Component {
   rejected(){
     console.log('rejected')
   }
-
+  test(){
+    this.setState({
+      error:
+        <div>
+          The page is outdated.
+          <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+            Refresh.
+          </a>
+        </div>
+    })
+  }
   received(data){
     console.log('received data', data)
     if(data.errors){
-      this.setState({ error: data.errors.join(', ') })
-      this.toTop()
+      this.showError(data.errors.join(', '))
       return
     }
     switch(data.action){
       case 'create_todo_list':
         window.location = `/todo_lists/${data.todo_list.id}`
+        return
+      case 'update_todo_list':
+        this.showError(
+          <div>
+            The page is outdated.
+            <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+              Reload.
+            </a>
+          </div>
+        )
+        return
+      case 'destroy_todo_list':
+        this.showError(
+          <div>
+            The list is deleted.
+            <a href="/todo_lists" style={{ cursor: 'pointer' }}>
+              Refresh.
+            </a>
+          </div>
+        )
         return
     }
     this.setState(prevState => {
@@ -91,6 +122,11 @@ class TodoListsContainer extends React.Component {
 
       return({ todos: nextTodos, logs: nextLogs })
     })
+  }
+
+  showError(error){
+    this.setState({ error: error })
+    this.toTop()
   }
 
   toTop(){
@@ -197,6 +233,7 @@ class TodoListsContainer extends React.Component {
                         <input type="text"
                           ref={el => this.newTodoDescriptionInput = el}
                           className="form-control"
+                          required="true"
                           placeholder="Add Todo..."
                         />
                         <span className="input-group-btn">
