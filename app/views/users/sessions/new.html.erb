@@ -1,0 +1,68 @@
+<div class="position-relative">
+  <div class="login-box visible widget-box no-border">
+    <div class="widget-body">
+      <div class="widget-main">
+        <h4 class="header blue lighter bigger">
+          <i class="ace-icon fa fa-coffee green"></i>
+          Please Enter Your Information
+        </h4>
+
+        <div class="space-6"></div>
+
+        <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+          <fieldset>
+            <label class="block clearfix">
+              <span class="block input-icon input-icon-right">
+                <%= f.email_field :email, autofocus: true, autocomplete: 'email', class: 'form-control', placeholder: 'Email' %>
+                <i class="ace-icon fa fa-envelope"></i>
+              </span>
+            </label>
+
+            <label class="block clearfix">
+              <span class="block input-icon input-icon-right">
+                <%= f.password_field :password, autocomplete: 'off', class: 'form-control', placeholder: 'Password' %>
+                <i class="ace-icon fa fa-lock"></i>
+              </span>
+            </label>
+
+            <div class="space"></div>
+
+            <div class="clearfix">
+              <label class="inline">
+                <% if devise_mapping.rememberable? %>
+                  <input type="checkbox" class="ace">
+                  <span class="lbl"> Remember Me</span>
+                <% end %>
+              </label>
+              <button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
+                <i class="ace-icon fa fa-key"></i>
+                <span class="bigger-110">Login</span>
+              </button>
+            </div>
+
+            <div class="space-4"></div>
+          </fieldset>
+        <% end %>
+      </div><!-- /.widget-main -->
+
+      <div class="toolbar clearfix">
+        <div>
+          <%# TODO: Forgot password, devise link helper can be found in users/shared/_links %>
+          <!--
+          <a href="#" data-target="#forgot-box" class="forgot-password-link">
+            <i class="ace-icon fa fa-arrow-left"></i>
+            I forgot my password
+          </a>
+          -->
+        </div>
+
+        <div>
+          <a class="user-signup-link" href="<%= new_registration_path(resource_name) %>">
+            I want to register
+            <i class="ace-icon fa fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div><!-- /.widget-body -->
+  </div><!-- /.login-box -->
+</div><!-- /.position-relative -->

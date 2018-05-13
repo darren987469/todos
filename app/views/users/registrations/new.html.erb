@@ -1,0 +1,81 @@
+<div class="signup-box widget-box no-border visible">
+  <div class="widget-body">
+    <div class="widget-main">
+      <h4 class="header green lighter bigger">
+        <i class="ace-icon fa fa-users blue"></i>
+        New User Registration
+      </h4>
+
+      <div class="space-6"></div>
+      <p> Enter your details to begin: </p>
+
+      <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+        <%= devise_error_messages! %>
+
+        <fieldset>
+          <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+              <%= f.email_field :email, autofocus: true, autocomplete: 'email', class: 'form-control', placeholder: 'Email', required: true %>
+              <i class="ace-icon fa fa-envelope"></i>
+            </span>
+          </label>
+
+          <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+              <%= f.text_field :first_name, placeholder: 'First name', required: true, style: 'width: 49%' %>
+              <%= f.text_field :last_name, placeholder: 'Last name', required: true, style: 'width: 49%' %>
+            </span>
+          </label>
+
+          <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+              <%= f.password_field :password, autocomplete: 'off', class: 'form-control', placeholder: "Password#{@minimum_password_length ? "(#{@minimum_password_length} characters minimum)" : ''}", required: true %>
+              <i class="ace-icon fa fa-lock"></i>
+            </span>
+          </label>
+
+          <label class="block clearfix">
+            <span class="block input-icon input-icon-right">
+              <%= f.password_field :password_confirmation, autocomplete: 'off', class: 'form-control', placeholder: "Password#{@minimum_password_length ? "(#{@minimum_password_length} characters minimum)" : ''}", required: true %>
+              <i class="ace-icon fa fa-retweet"></i>
+            </span>
+          </label>
+
+          <!-- No Policy now >
+          <label class="block">
+            <input type="checkbox" class="ace">
+            <span class="lbl">
+              I accept the
+              <a href="#">User Agreement</a>
+            </span>
+          </label>
+          -->
+
+          <div class="space-24"></div>
+
+          <div class="clearfix">
+            <!--
+            <button type="reset" class="width-30 pull-left btn btn-sm">
+              <i class="ace-icon fa fa-refresh"></i>
+              <span class="bigger-110">Reset</span>
+            </button>
+            -->
+
+            <button type="submit" class="width-65 pull-right btn btn-sm btn-success">
+              <span class="bigger-110">Register</span>
+
+              <i class="ace-icon fa fa-arrow-right icon-on-right"></i>
+            </button>
+          </div>
+        </fieldset>
+      <% end %>
+    </div>
+
+    <div class="toolbar center">
+      <a href="<%= new_session_path(resource_name) %>" class="back-to-login-link">
+        <i class="ace-icon fa fa-arrow-left"></i>
+        Back to login
+      </a>
+    </div>
+  </div><!-- /.widget-body -->
+</div><!-- /.signup-box -->
