@@ -3,4 +3,5 @@ class Todo < ApplicationRecord
   has_many :logs, as: :resourceable, class_name: 'EventLog'
 
   scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil ) }
 end
