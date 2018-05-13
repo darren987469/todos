@@ -10,4 +10,8 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}"
   end
   alias name full_name
+
+  def role_of(todo_list)
+    todo_listships.where(todo_list: todo_list).first.role.inquiry
+  end
 end
