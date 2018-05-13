@@ -121,36 +121,32 @@ class TodoListChannel < ApplicationCable::Channel
   def clear_assigned_instance_variables!
     @params, @action = nil, nil
     @todo_list, @todo = nil, nil
+    @member = nil
     @log = nil
   end
 
-  def create_log!(resource, options = {})
+  def create_log!(resource, description: nil, tag: nil, changes: nil)
     return unless resource.errors.messages.blank?
 
-    description =
-      case @action
-      when 'add member'
-        'add a member to todo list'
-      when 'create_todo_list'
-        'create a todo list'
-      when 'update_todo_list'
-        'update a todo list'
-      when 'destroy_todo_list'
-        'destroy a todo list'
-      when 'create_todo'
-        'create a todo'
-      when 'update_todo'
-        'update a todo'
-      when 'destroy todo'
-        'destroy todo'
-      end
+    case @action
+    when 'add member'
+      action = 'create'
+      description = 'add a member to todo list'
+    when 'create_todo_list', 'create_todo'
+      action = 'create'
+    when 'update_todo_list', 'update_todo'
+      action = 'update'
+    when 'destroy_todo_list', 'destroy_todo_list'
+      action = 'destroy'
+    end
 
-    @log = EventLog.create(
-      resourceable: resource,
+    @log = EventLogger.log(
+      resource: resource,
       user: current_user,
-      action: @action,
-      description: "#{current_user.name} #{description}.",
-      variation: options[:changes]
+      action: action,
+      description: description,
+      tag: tag,
+      changes: changes,
     )
   end
 end
