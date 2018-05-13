@@ -9,7 +9,7 @@ class EventLogger
     def log(resource:, user:, action:, tag: nil, description: nil, changes: nil)
       raise ArgumentError unless VALID_ACTION.include?(action.to_s)
 
-      resource_name = resource.class.to_s.downcase
+      resource_name = resource.class.name.underscore
       EventLog.create!(
         resourceable: resource,
         user: user,

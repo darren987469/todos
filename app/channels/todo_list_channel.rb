@@ -24,7 +24,7 @@ class TodoListChannel < ApplicationCable::Channel
     broadcast_errors(['Forbidden'])
   rescue StandardError => e
     broadcast_errors(['500 Error'])
-    raise if development?
+    raise if Rails.env.development?
   end
 
   private
@@ -34,9 +34,12 @@ class TodoListChannel < ApplicationCable::Channel
     @member = User.find_by_email(params[:email])
     raise ActiveRecord::RecordNotFound unless @member.present?
 
-    todo_listship = @todo_list.todo_listships.create(user: @member, role: :user)
+    todo_listship = @todo_list.todo_listships.new(user: @member, role: :user)
+    ActiveRecord::Base.transaction do
+      todo_listship.save
+      create_log!(@todo_list) if todo_listship.errors.blank?
+    end
 
-    create_log!(@todo_list) unless todo_listship.errors.blank?
     ActionCable.server.broadcast(@stream_token,
       action: @action,
       member: @member,
@@ -128,24 +131,25 @@ class TodoListChannel < ApplicationCable::Channel
   def create_log!(resource, description: nil, tag: nil, changes: nil)
     return unless resource.errors.messages.blank?
 
-    case @action
-    when 'add member'
-      action = 'create'
-      description = 'add a member to todo list'
-    when 'create_todo_list', 'create_todo'
-      action = 'create'
-    when 'update_todo_list', 'update_todo'
-      action = 'update'
-    when 'destroy_todo_list', 'destroy_todo_list'
-      action = 'destroy'
-    end
+    resource_action =
+      case @action
+      when 'add_member'
+        description = "#{current_user.name} add a member #{@member.name} to todo list."
+        'create'
+      when 'create_todo_list', 'create_todo'
+        'create'
+      when 'update_todo_list', 'update_todo'
+        'update'
+      when 'destroy_todo_list', 'destroy_todo_list'
+        'destroy'
+      end
 
-    @log = EventLogger.log(
+    @log = ::EventLogger.log(
       resource: resource,
       user: current_user,
-      action: action,
+      action: resource_action,
       description: description,
-      tag: tag,
+      tag: tag || @todo_list ? @todo_list.log_tag : "todo_list_#{@todo.todo_list_id}",
       changes: changes,
     )
   end
