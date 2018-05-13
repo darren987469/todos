@@ -3,7 +3,7 @@ class TodoListsContainer extends React.Component {
     super(props)
     this.state = {
       todoLists: props.todo_lists,
-      currentTodoListId: props.todo_list_id,
+      currentTodoList: props.current_todo_list,
       todos: props.todos,
       logs: props.logs,
       error: null
@@ -14,8 +14,9 @@ class TodoListsContainer extends React.Component {
     this.received = this.received.bind(this)
     this.redirect = this.received.bind(this)
     this.nextLogsState = this.nextLogsState.bind(this)
+    this.toTop = this.toTop.bind(this)
+    this.showError = this.showError.bind(this)
 
-    this.addMemberRequest = this.addMemberRequest.bind(this)
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
     this.destroyTodoRequest = this.destroyTodoRequest.bind(this)
@@ -25,7 +26,7 @@ class TodoListsContainer extends React.Component {
   componentDidMount(){
     console.log('componentDidMount')
     this.subscription = App.cable.subscriptions.create({
-      channel: 'TodoListChannel', id: this.state.currentTodoListId
+      channel: 'TodoListChannel', id: this.state.currentTodoList.id
     },
     {
       connected: this.connected,
@@ -33,6 +34,10 @@ class TodoListsContainer extends React.Component {
       rejected: this.rejected,
       received: this.received,
     })
+  }
+
+  componentWillUnmount(){
+    this.subscription.unsubscribe()
   }
 
   connected(){
@@ -46,27 +51,46 @@ class TodoListsContainer extends React.Component {
   rejected(){
     console.log('rejected')
   }
-
+  test(){
+    this.setState({
+      error:
+        <div>
+          The page is outdated.
+          <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+            Refresh.
+          </a>
+        </div>
+    })
+  }
   received(data){
     console.log('received data', data)
     if(data.errors){
-      this.setState({ error: data.errors.join(', ') })
-      this.toTop()
+      this.showError(data.errors.join(', '))
       return
     }
     switch(data.action){
       case 'create_todo_list':
         window.location = `/todo_lists/${data.todo_list.id}`
         return
-      case 'destroy_todo_list':
-        window.location = '/todo_lists'
+      case 'update_todo_list':
+        this.showError(
+          <div>
+            The page is outdated.
+            <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+              Reload.
+            </a>
+          </div>
+        )
         return
-      case 'add_member':
-        alert(`Successful add member ${data.member.first_name} ${data.member.last_name}!`)
-        this.addMemberEmailInput.value = ''
-        if(data.log){
-          this.setState({ logs: this.nextLogsState(data.log) })
-        }
+      case 'destroy_todo_list':
+        this.showError(
+          <div>
+            The list is deleted.
+            <a href="/todo_lists" style={{ cursor: 'pointer' }}>
+              Refresh.
+            </a>
+          </div>
+        )
         return
     }
     this.setState(prevState => {
@@ -100,6 +124,11 @@ class TodoListsContainer extends React.Component {
     })
   }
 
+  showError(error){
+    this.setState({ error: error })
+    this.toTop()
+  }
+
   toTop(){
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
@@ -109,103 +138,35 @@ class TodoListsContainer extends React.Component {
     return this.state.logs.concat(newLog).sort((a, b) => b.id - a.id)
   }
 
-  addMemberRequest(email){
-    this.request('add_member', { id: this.state.currentTodoListId, email: email })
-  }
-
   createTodoListRequest(){
     this.request('create_todo_list')
   }
 
-  destroyTodoListRequest(id){
-    this.request('destroy_todo_list', { id: id })
-  }
-
   createTodoRequest(description){
     this.request('create_todo', { todo: { description: description }})
-    /*
-      this.request(
-        { todo: { description: description }},
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos`,
-          method: 'POST',
-          success: (res) => {
-            this.setState(prevState => {
-              return({ todos: prevState.todos.concat(res) })
-            })
-          }
-        }
-      )
-    */
   }
 
   patchTodoRequest(id, params, callback){
     this.request('update_todo', { todo: Object.assign({ id: id }, params) })
-    /*
-      this.request(
-        { todo: params },
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-          method: 'PATCH',
-          success: (res, textStatus, xhr) => {
-            if(xhr.status == 200){
-              this.setState(prevState => {
-                return({
-                  todos: prevState.todos.map(todo =>
-                    todo.id === res.id ? res : todo
-                  )
-                })
-              })
-            }
-            if(callback)
-              callback(res, textStatus, xhr)
-          }
-        }
-      )
-    */
   }
 
   destroyTodoRequest(id){
     this.request('destroy_todo', { todo: { id: id } })
-    /*
-      this.request(
-        {},
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-          method: 'DELETE',
-          success: (res, textStatus, xhr) => {
-            if(xhr.status == 200){
-              this.setState(prevState => {
-                return({ todos: prevState.todos.filter(todo => todo.id !== res.id) })
-              })
-            }
-          }
-        }
-      )
-    */
   }
 
   request(method, params = {}, options = {}){
     console.log('request method:', method)
     const data = Object.assign(
       { method: method },
-      { todo_list_id: this.props.todo_list_id },
+      { todo_list_id: this.state.currentTodoList.id },
       params
     )
     console.log('request data:', data)
     this.subscription.perform('request', data)
-    /*
-      var defaultOptions = {
-        method: 'GET',
-        contentType: 'application/json',
-        data: JSON.stringify(params),
-      }
-      $.ajax({ ...defaultOptions, ...options })
-    */
   }
 
   render() {
-    const { currentTodoListId, todoLists, todos, logs, error } = this.state
+    const { currentTodoList, todoLists, todos, logs, error } = this.state
     const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
       <div className="main-container">
@@ -213,7 +174,7 @@ class TodoListsContainer extends React.Component {
           <ul className="nav nav-list">
             {
               todoLists.map(todoList =>
-                <li key={todoList.id} className={ todoList.id === currentTodoListId ? 'active' : ''}>
+                <li key={todoList.id} className={ todoList.id === currentTodoList.id ? 'active' : ''}>
                   <a href={`/todo_lists/${todoList.id}`}>
                     <span className="menu-text">{ todoList.name }</span>
                   </a>
@@ -235,6 +196,19 @@ class TodoListsContainer extends React.Component {
         <div className="main-content">
           <div className="main-content-inner">
             <div className="page-content">
+              <div className="page-header">
+                <h1>
+                  { currentTodoList.name }
+                  <small>
+                    <i className="ace-icon fa fa-angle-double-right" style={{ marginRight: '5px' }}/>
+                    <a href={`/todo_lists/${currentTodoList.id}/edit`}>
+                      <i className="fa fa-cog"/>
+                      Settings
+                    </a>
+                  </small>
+                </h1>
+              </div>
+
               <div className="row" style={{ height: '500px'}}>
 
                 {/* Error Message Block */}
@@ -259,6 +233,7 @@ class TodoListsContainer extends React.Component {
                         <input type="text"
                           ref={el => this.newTodoDescriptionInput = el}
                           className="form-control"
+                          required="true"
                           placeholder="Add Todo..."
                         />
                         <span className="input-group-btn">
@@ -296,55 +271,6 @@ class TodoListsContainer extends React.Component {
                       </div>
                     </div>
                     <p>Note: Hold a while on Detail to see tooltip.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-sm-6">
-                  <div className="widget-box widget-color-blue">
-                    <div className="widget-header">
-                      <h4>Add member</h4>
-                    </div>
-                    <div className="widget-body">
-                      <div className="widget-main">
-                        <form onSubmit={e => {
-                          e.preventDefault()
-                          const email = this.addMemberEmailInput.value
-                          this.addMemberRequest(email)
-                        }}>
-                          Add a member to the todo list.
-                          <div className="input-group">
-                            <input type="email"
-                              ref={el => this.addMemberEmailInput = el}
-                              className="form-control"
-                              placeholder="Add member email..."
-                            />
-                            <span className="input-group-btn">
-                              <button className="btn btn-primary btn-sm">Add Member</button>
-                            </span>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-sm-6">
-                  <div className="widget-box widget-color-red2">
-                    <div className="widget-header">
-                      <h4>Danger Zone</h4>
-                    </div>
-                    <div className="widget-body">
-                      <div className="widget-main">
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => this.destroyTodoListRequest(currentTodoListId)}
-                        >
-                          Delete this todo list
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -492,12 +418,14 @@ class Log extends React.Component{
     this.timerId = setInterval(() => this.tick(), 1000)
   }
 
-  componentWillMount(){
+  componentWillUnmount(){
     clearInterval(this.timerId)
+    this.timerId = null
   }
 
   tick(){
-    this.setState({ created_at: this.formatCreatedAt() })
+    if(this.timerId)
+      this.setState({ created_at: this.formatCreatedAt() })
   }
 
   formatCreatedAt(){

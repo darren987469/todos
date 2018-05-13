@@ -1,8 +1,7 @@
-<%= javascript_include_tag 'cable' %>
 <%=
   react_component('TodoListsContainer',
     todo_lists: @todo_lists,
-    todo_list_id: @todo_list.id,
+    current_todo_list: @todo_list,
     todos: @todos,
     logs: @logs
   )

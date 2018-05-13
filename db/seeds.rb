@@ -12,7 +12,12 @@ user2 = User.create(first_name: 'Darren', last_name: 'Handsome', email: 'darren.
 todo_list1 = TodoList.create(name: 'Super Team')
 todo_list1.todo_listships.create(user: user1, role: :owner)
 
-Todo.create([
-  { description: 'todo1', complete: false, todo_list: todo_list1 },
-  { description: 'todo1', complete: true, todo_list: todo_list1 }
-])
+todo1 = Todo.create description: 'todo1', complete: false, todo_list: todo_list1
+todo2 = Todo.create description: 'todo1', complete: false, todo_list: todo_list1
+
+EventLogger.log(resource: todo1, user: user1, action: :create, tag: todo_list1.log_tag)
+EventLogger.log(resource: todo2, user: user1, action: :create, tag: todo_list1.log_tag)
+
+todo2.complete = true
+todo2.save
+EventLogger.log(resource: todo2, user: user1, action: :update, tag: todo_list1.log_tag, changes: todo2.previous_changes.except(:updated_at))

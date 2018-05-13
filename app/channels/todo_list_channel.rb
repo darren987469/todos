@@ -4,11 +4,12 @@ class TodoListChannel < ApplicationCable::Channel
   class UnknownAction < StandardError; end
   class NotAuthorizedError < StandardError; end
 
-  VALID_ACTION = %w( add_member create_todo_list update_todo_list destroy_todo_list
+  VALID_ACTION = %w( create_todo_list update_todo_list destroy_todo_list
     create_todo update_todo destroy_todo )
 
   def subscribed
-    @stream_token = "todo_list_#{params[:id]}"
+    todo_list = TodoList.find(params[:id])
+    @stream_token = todo_list.log_tag
     stream_from @stream_token
   end
 
@@ -29,26 +30,6 @@ class TodoListChannel < ApplicationCable::Channel
 
   private
 
-  def add_member
-    @todo_list = current_user.todo_lists.find(params[:id])
-    @member = User.find_by_email(params[:email])
-    raise ActiveRecord::RecordNotFound unless @member.present?
-
-    todo_listship = @todo_list.todo_listships.new(user: @member, role: :user)
-    ActiveRecord::Base.transaction do
-      todo_listship.save
-      create_log!(@todo_list) if todo_listship.errors.blank?
-    end
-
-    ActionCable.server.broadcast(@stream_token,
-      action: @action,
-      member: @member,
-      log: @log,
-      errors: todo_listship.errors.messages.presence
-    )
-    clear_assigned_instance_variables!
-  end
-
   def create_todo_list
     ActiveRecord::Base.transaction do
       @todo_list = TodoList.new(name: "List #{current_user.todo_lists.count + 1}",)
@@ -59,11 +40,6 @@ class TodoListChannel < ApplicationCable::Channel
 
     create_log!(@todo_list)
     broadcast(@todo_list)
-  end
-
-  def update_todo_list
-    raise NotImplementedError
-    @action = 'update_todo_list'
   end
 
   def destroy_todo_list
@@ -124,7 +100,6 @@ class TodoListChannel < ApplicationCable::Channel
   def clear_assigned_instance_variables!
     @params, @action = nil, nil
     @todo_list, @todo = nil, nil
-    @member = nil
     @log = nil
   end
 
@@ -133,14 +108,11 @@ class TodoListChannel < ApplicationCable::Channel
 
     resource_action =
       case @action
-      when 'add_member'
-        description = "#{current_user.name} add a member #{@member.name} to todo list."
-        'create'
       when 'create_todo_list', 'create_todo'
         'create'
       when 'update_todo_list', 'update_todo'
         changes[:archived_at] ? 'archive' : 'update'
-      when 'destroy_todo_list', 'destroy_todo_list'
+      when 'destroy_todo_list', 'destroy_todo'
         'destroy'
       end
 

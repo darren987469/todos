@@ -1,0 +1,80 @@
+<div class="container-fluid" style="font-size: 15px;">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="widget-box transparent" style="opacity: 1;">
+        <div class="widget-header">
+          <h2 class="widget-title lighter">
+            <%= @todo_list.name %>
+            <small>
+              <i class="ace-icon fa fa-angle-double-right"></i>
+              <%= link_to 'Back to create todos', todo_list_path(@todo_list) %>
+            </small>
+          </h2>
+        </div>
+
+        <div class="widget-body">
+          <div class="widget-main padding-6">
+            <h4> Settings </h4>
+            <%= form_for @todo_list, html: { class: 'form-inline' } do |f| %>
+              <div class="form-group">
+                <%= f.label :name %>
+                <%= f.text_field :name, class: 'form-control', placeholder: 'Todo list name', required: true %>
+                <input type="submit" class="btn btn-sm btn-primary" value="Rename"/>
+              </div>
+            <% end %>
+            <hr></hr>
+
+            <h4> Members </h4>
+            <p> Roles are owner, admin, user. Owner can delete list. Admin can invite/delete member.</p>
+            <%= form_for @todo_listship, url: todo_list_todo_listships_path(@todo_list), method: :post do |f| %>
+              <div class="input-group">
+                <input name="email" type="email" placeholder="Memer email..." class="form-control" required="true">
+                <span class="input-group-btn">
+                  <button class="btn btn-sm btn-primary" type="submit">Add Member</button>
+                </span>
+              </div>
+              <div class="space-8"></div>
+            <% end %>
+
+            <table class="table table-striped table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <%
+                  @users.each do |user|
+                    todo_listship = user.todo_listships.first
+                %>
+                  <tr>
+                    <td><%= user.name %></td>
+                    <td><%= user.email %></td>
+                    <td><%= todo_listship.role %></td>
+                    <td>
+                      <div class="hidden-sm hidden-xs btn-group">
+                        <% if user.id != current_user.id %>
+                          <a href="<%= todo_list_todo_listship_path(@todo_list, todo_listship) %>" data-method="delete" class="btn btn-xs btn-danger">
+                            <i class="ace-icon fa fa-trash-o bigger-120"></i>
+                          </a>
+                        <% end %>
+                      </div>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <hr></hr>
+
+            <h4 class="text-danger">Danger Zone</h4>
+            <p><strong>Delete this list.</strong> Todos in this list will also be deleted. Once you delete this list, there is no going back. Please be certain.</p>
+            <%= button_to 'Delete', todo_list_path(@todo_list), method: :delete, class: 'btn btn-danger btn-sm' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

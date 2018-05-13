@@ -1,6 +1,23 @@
 <% if notice %>
-  <div class="alert alert-info"><%= notice %></div>
+  <div class="alert alert-info">
+    <button type="button" class="close" onclick="dismissAlert(this)">
+			<i class="ace-icon fa fa-times"></i>
+		</button>
+    <%= notice %>
+  </div>
 <% end %>
+
 <% if alert %>
-  <div class="alert alert-danger"><%= alert %></div>
+  <div class="alert alert-danger">
+    <button type="button" class="close" onclick="dismissAlert(this)">
+			<i class="ace-icon fa fa-times"></i>
+		</button>
+    <%= alert %>
+  </div>
 <% end %>
+
+<script>
+  function dismissAlert(alertDismissButton) {
+    $(alertDismissButton).parent().addClass('hidden')
+  }
+</script>

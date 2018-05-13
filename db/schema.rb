@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 2018_05_12_052446) do
 
   create_table "todos", force: :cascade do |t|
     t.bigint "todo_list_id"
-    t.string "description"
+    t.string "description", null: false
     t.boolean "complete", default: false
     t.datetime "archived_at"
     t.datetime "created_at", null: false
