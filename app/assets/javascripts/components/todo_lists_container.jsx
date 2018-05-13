@@ -6,6 +6,7 @@ class TodoListsContainer extends React.Component {
       currentTodoListId: props.todo_list_id,
       todos: props.todos,
       logs: props.logs,
+      error: null
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -49,7 +50,8 @@ class TodoListsContainer extends React.Component {
   received(data){
     console.log('received data', data)
     if(data.errors){
-      console.error(data.errors)
+      this.setState({ error: data.errors.join(', ') })
+      this.toTop()
       return
     }
     switch(data.action){
@@ -93,6 +95,11 @@ class TodoListsContainer extends React.Component {
 
       return({ todos: nextTodos, logs: nextLogs })
     })
+  }
+
+  toTop(){
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
   }
 
   nextLogsState(newLog){
@@ -195,7 +202,7 @@ class TodoListsContainer extends React.Component {
   }
 
   render() {
-    const { currentTodoListId, todoLists, todos, logs } = this.state
+    const { currentTodoListId, todoLists, todos, logs, error } = this.state
     const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
       <div className="main-container">
@@ -226,6 +233,19 @@ class TodoListsContainer extends React.Component {
           <div className="main-content-inner">
             <div className="page-content">
               <div className="row" style={{ height: '500px'}}>
+
+                {/* Error Message Block */}
+                {
+                  error &&
+                  <div className="alert alert-block alert-danger">
+                    <a className="close" onClick={() => this.setState({ error: null })}>
+                      <i className="ace-icon fa fa-times"></i>
+                    </a>
+                    { error }
+                  </div>
+                }
+                {/* Error Message */}
+
                 <div className="col-sm-6">
                   <div className="dd">
                     <form onSubmit={event => {
