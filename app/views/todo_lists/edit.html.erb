@@ -32,19 +32,24 @@
                 </tr>
               </thead>
               <tbody>
-                <% @users.each do |user| %>
+                <%
+                  @users.each do |user|
+                    todo_listship = user.todo_listships.first
+                %>
                   <tr>
                     <td><%= user.name %></td>
                     <td><%= user.email %></td>
-                    <td><%= user.todo_listships.first.role %></td>
+                    <td><%= todo_listship.role %></td>
                     <td>
                       <div class="hidden-sm hidden-xs btn-group">
                         <button class="btn btn-xs btn-info">
                           <i class="ace-icon fa fa-pencil bigger-120"></i>
                         </button>
-                        <button class="btn btn-xs btn-danger">
-                          <i class="ace-icon fa fa-trash-o bigger-120"></i>
-                        </button>
+                        <% if user.id != current_user.id %>
+                          <a href="<%= todo_list_todo_listship_path(@todo_list, todo_listship) %>" data-method="delete" class="btn btn-xs btn-danger">
+                            <i class="ace-icon fa fa-trash-o bigger-120"></i>
+                          </a>
+                        <% end %>
                       </div>
                     </td>
                   </tr>
