@@ -1,5 +1,5 @@
 class EventLogger
-  VALID_ACTION = %w( create update destroy )
+  VALID_ACTION = %w( create update destroy archive )
 
   class << self
     # == Example usage:

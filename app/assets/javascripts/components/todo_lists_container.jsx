@@ -6,6 +6,7 @@ class TodoListsContainer extends React.Component {
       currentTodoListId: props.todo_list_id,
       todos: props.todos,
       logs: props.logs,
+      error: null
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -49,7 +50,8 @@ class TodoListsContainer extends React.Component {
   received(data){
     console.log('received data', data)
     if(data.errors){
-      console.error(data.errors)
+      this.setState({ error: data.errors.join(', ') })
+      this.toTop()
       return
     }
     switch(data.action){
@@ -75,7 +77,10 @@ class TodoListsContainer extends React.Component {
           this.newTodoDescriptionInput.value = ''
           break
         case 'update_todo':
-          nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
+          if(data.todo.archived_at) // filter archived
+            nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
+          else
+            nextTodos = prevState.todos.map(todo => todo.id === data.todo.id ? data.todo : todo)
           break
         case 'destroy_todo':
           nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
@@ -93,6 +98,11 @@ class TodoListsContainer extends React.Component {
 
       return({ todos: nextTodos, logs: nextLogs })
     })
+  }
+
+  toTop(){
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
   }
 
   nextLogsState(newLog){
@@ -195,7 +205,7 @@ class TodoListsContainer extends React.Component {
   }
 
   render() {
-    const { currentTodoListId, todoLists, todos, logs } = this.state
+    const { currentTodoListId, todoLists, todos, logs, error } = this.state
     const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
       <div className="main-container">
@@ -226,6 +236,19 @@ class TodoListsContainer extends React.Component {
           <div className="main-content-inner">
             <div className="page-content">
               <div className="row" style={{ height: '500px'}}>
+
+                {/* Error Message Block */}
+                {
+                  error &&
+                  <div className="alert alert-block alert-danger">
+                    <a className="close" onClick={() => this.setState({ error: null })}>
+                      <i className="ace-icon fa fa-times"></i>
+                    </a>
+                    { error }
+                  </div>
+                }
+                {/* Error Message */}
+
                 <div className="col-sm-6">
                   <div className="dd">
                     <form onSubmit={event => {
@@ -342,18 +365,18 @@ TodoListsContainer.propTypes = {
 class Todo extends React.Component {
   constructor(props){
     super(props)
-
     this.state = {
       mode: 'show', // or 'edit'
       description: props.todo.description,
       descriptionWas: props.todo.description,
     }
-    this.handleSubmit = this.handleSubmit.bind(this)
+    this.handleUpdate = this.handleUpdate.bind(this)
+    this.handleArchive = this.handleArchive.bind(this)
     this.renderShow = this.renderShow.bind(this)
     this.renderEdit = this.renderEdit.bind(this)
   }
 
-  handleSubmit(event){
+  handleUpdate(){
     const { todo, patchTodoRequest } = this.props
     patchTodoRequest(
       todo.id,
@@ -367,6 +390,11 @@ class Todo extends React.Component {
     )
     // for websocket callback
     this.setState({ mode: 'show' })
+  }
+
+  handleArchive(){
+    const { todo, patchTodoRequest } = this.props
+    patchTodoRequest(todo.id, { archived_at: new Date() })
   }
 
   renderShow(){
@@ -390,11 +418,17 @@ class Todo extends React.Component {
           <div className="pull-right action-buttons">
             {
               !todo.complete &&
-              <a className="blue" onClick={() => this.setState({ mode: 'edit' })}>
+              <a className="blue" onClick={() => this.setState({ mode: 'edit' })} title="edit">
                 <i className="ace-icon fa fa-pencil bigger-150"></i>
               </a>
             }
-            <a className="red" onClick={() => destroyTodoRequest(todo.id)}>
+            {
+              todo.complete &&
+              <a className="brown" onClick={this.handleArchive} title="archive">
+                <i className="ace-icon fa fa-archive bigger-150"></i>
+              </a>
+            }
+            <a className="red" onClick={() => destroyTodoRequest(todo.id)} title="delete">
               <i className="ace-icon fa fa-trash-o bigger-150"></i>
             </a>
           </div>
@@ -427,7 +461,7 @@ class Todo extends React.Component {
             onChange={event => this.setState({ description: event.target.value })}
           />
           <div className="pull-right action-buttons">
-            <a className="green" onClick={this.handleSubmit}>
+            <a className="green" onClick={this.handleUpdate}>
               <i className="ace-icon fa fa-check bigger-150"></i>
             </a>
             <a className="red" onClick={() => this.setState({ mode: 'show' })}>

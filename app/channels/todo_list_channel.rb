@@ -101,7 +101,7 @@ class TodoListChannel < ApplicationCable::Channel
   end
 
   def todo_params
-    params.require(:todo).permit(:description, :complete, :id)
+    params.require(:todo).permit(:description, :complete, :id, :archived_at)
   end
 
   def broadcast(resource)
@@ -139,7 +139,7 @@ class TodoListChannel < ApplicationCable::Channel
       when 'create_todo_list', 'create_todo'
         'create'
       when 'update_todo_list', 'update_todo'
-        'update'
+        changes[:archived_at] ? 'archive' : 'update'
       when 'destroy_todo_list', 'destroy_todo_list'
         'destroy'
       end
