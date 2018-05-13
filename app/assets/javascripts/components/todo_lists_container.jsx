@@ -12,6 +12,7 @@ class TodoListsContainer extends React.Component {
     this.rejected = this.rejected.bind(this)
     this.received = this.received.bind(this)
     this.redirect = this.received.bind(this)
+    this.nextLogsState = this.nextLogsState.bind(this)
 
     this.addMemberRequest = this.addMemberRequest.bind(this)
     this.createTodoRequest = this.createTodoRequest.bind(this)
@@ -61,6 +62,9 @@ class TodoListsContainer extends React.Component {
       case 'add_member':
         alert(`Successful add member ${data.member.first_name} ${data.member.last_name}!`)
         this.addMemberEmailInput.value = ''
+        if(data.log){
+          this.setState({ logs: this.nextLogsState(data.log) })
+        }
         return
     }
     this.setState(prevState => {
@@ -84,12 +88,15 @@ class TodoListsContainer extends React.Component {
 
       var nextLogs = prevState.logs
       if(data.log){
-        nextLogs = nextLogs.concat(data.log)
-        nextLogs.sort((a, b) => b.id - a.id)
+        nextLogs = this.nextLogsState(data.log)
       }
 
       return({ todos: nextTodos, logs: nextLogs })
     })
+  }
+
+  nextLogsState(newLog){
+    return this.state.logs.concat(newLog).sort((a, b) => b.id - a.id)
   }
 
   addMemberRequest(email){
@@ -265,7 +272,7 @@ class TodoListsContainer extends React.Component {
                         { logs.map(log => <Log key={log.id} log={log}/>) }
                       </div>
                     </div>
-                    <p>Note: Hold a while to see detail tooltip.</p>
+                    <p>Note: Hold a while on Detail to see tooltip.</p>
                   </div>
                 </div>
               </div>

@@ -14,4 +14,8 @@ class TodoList < ApplicationRecord
       todo_list.todo_listships.create!(user: user, role: :admin)
     end
   end
+
+  def log_tag
+    "#{self.class.name.underscore}_#{id}"
+  end
 end

@@ -19,12 +19,14 @@ ActiveRecord::Schema.define(version: 2018_05_12_052446) do
     t.string "resourceable_type"
     t.bigint "resourceable_id"
     t.bigint "user_id"
+    t.string "tag"
     t.string "action"
     t.string "description"
     t.jsonb "variation"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["resourceable_type", "resourceable_id"], name: "index_event_logs_on_resourceable_type_and_resourceable_id"
+    t.index ["tag"], name: "index_event_logs_on_tag"
     t.index ["user_id"], name: "index_event_logs_on_user_id"
   end
 
