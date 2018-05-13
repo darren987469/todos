@@ -13,7 +13,7 @@ class TodoListsController < ApplicationController
     @todo_list = @todo_lists.find { |todo_list| todo_list.id == params[:id].to_i }
     raise ActiveRecord::RecordNotFound unless @todo_list.present?
 
-    @todos = @todo_list.todos.order(id: :asc)
+    @todos = @todo_list.todos.active.order(id: :asc)
     @logs = EventLog.where(tag: @todo_list.log_tag).order(id: :desc).limit(10)
   end
 end
