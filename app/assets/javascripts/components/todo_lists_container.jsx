@@ -34,6 +34,10 @@ class TodoListsContainer extends React.Component {
     })
   }
 
+  componentWillUnmount(){
+    this.subscription.unsubscribe()
+  }
+
   connected(){
     console.log('connected')
   }
@@ -374,12 +378,14 @@ class Log extends React.Component{
     this.timerId = setInterval(() => this.tick(), 1000)
   }
 
-  componentWillMount(){
+  componentWillUnmount(){
     clearInterval(this.timerId)
+    this.timerId = null
   }
 
   tick(){
-    this.setState({ created_at: this.formatCreatedAt() })
+    if(this.timerId)
+      this.setState({ created_at: this.formatCreatedAt() })
   }
 
   formatCreatedAt(){
