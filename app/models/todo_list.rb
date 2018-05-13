@@ -1,5 +1,5 @@
 class TodoList < ApplicationRecord
-  has_many :todos
+  has_many :todos, dependent: :delete_all
   has_many :logs, as: :resourceable, class_name: 'EventLog'
   has_many :todo_listships, dependent: :delete_all, class_name: '::TodoListship'
   has_many :users, through: :todo_listships

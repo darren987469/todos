@@ -5,6 +5,10 @@
         <div class="widget-header">
           <h2 class="widget-title lighter">
             <%= @todo_list.name %>
+            <small>
+              <i class="ace-icon fa fa-angle-double-right"></i>
+              <%= link_to 'Back to create todos', todo_list_path(@todo_list) %>
+            </small>
           </h2>
         </div>
 
@@ -56,6 +60,10 @@
                 <% end %>
               </tbody>
             </table>
+
+            <h4 class="text-danger">Danger Zone</h4>
+            <p><strong>Delete this list.</strong> Todos in this list will also be deleted. Once you delete this list, there is no going back. Please be certain.</p>
+            <%= button_to 'Delete', todo_list_path(@todo_list), method: :delete, class: 'btn btn-danger btn-sm' %>
           </div>
         </div>
       </div>

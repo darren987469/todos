@@ -57,9 +57,6 @@ class TodoListsContainer extends React.Component {
       case 'create_todo_list':
         window.location = `/todo_lists/${data.todo_list.id}`
         return
-      case 'destroy_todo_list':
-        window.location = '/todo_lists'
-        return
     }
     this.setState(prevState => {
       var nextTodos
@@ -105,72 +102,16 @@ class TodoListsContainer extends React.Component {
     this.request('create_todo_list')
   }
 
-  destroyTodoListRequest(id){
-    this.request('destroy_todo_list', { id: id })
-  }
-
   createTodoRequest(description){
     this.request('create_todo', { todo: { description: description }})
-    /*
-      this.request(
-        { todo: { description: description }},
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos`,
-          method: 'POST',
-          success: (res) => {
-            this.setState(prevState => {
-              return({ todos: prevState.todos.concat(res) })
-            })
-          }
-        }
-      )
-    */
   }
 
   patchTodoRequest(id, params, callback){
     this.request('update_todo', { todo: Object.assign({ id: id }, params) })
-    /*
-      this.request(
-        { todo: params },
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-          method: 'PATCH',
-          success: (res, textStatus, xhr) => {
-            if(xhr.status == 200){
-              this.setState(prevState => {
-                return({
-                  todos: prevState.todos.map(todo =>
-                    todo.id === res.id ? res : todo
-                  )
-                })
-              })
-            }
-            if(callback)
-              callback(res, textStatus, xhr)
-          }
-        }
-      )
-    */
   }
 
   destroyTodoRequest(id){
     this.request('destroy_todo', { todo: { id: id } })
-    /*
-      this.request(
-        {},
-        {
-          url: `/todo_lists/${this.props.todo_list_id}/todos/${id}`,
-          method: 'DELETE',
-          success: (res, textStatus, xhr) => {
-            if(xhr.status == 200){
-              this.setState(prevState => {
-                return({ todos: prevState.todos.filter(todo => todo.id !== res.id) })
-              })
-            }
-          }
-        }
-      )
-    */
   }
 
   request(method, params = {}, options = {}){
@@ -182,14 +123,6 @@ class TodoListsContainer extends React.Component {
     )
     console.log('request data:', data)
     this.subscription.perform('request', data)
-    /*
-      var defaultOptions = {
-        method: 'GET',
-        contentType: 'application/json',
-        data: JSON.stringify(params),
-      }
-      $.ajax({ ...defaultOptions, ...options })
-    */
   }
 
   render() {
@@ -294,26 +227,6 @@ class TodoListsContainer extends React.Component {
                       </div>
                     </div>
                     <p>Note: Hold a while on Detail to see tooltip.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="col-sm-6">
-                  <div className="widget-box widget-color-red2">
-                    <div className="widget-header">
-                      <h4>Danger Zone</h4>
-                    </div>
-                    <div className="widget-body">
-                      <div className="widget-main">
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => this.destroyTodoListRequest(currentTodoList.id)}
-                        >
-                          Delete this todo list
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
