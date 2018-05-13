@@ -9,7 +9,10 @@ class TodoListshipsController < ApplicationController
     end
 
     @member = User.find_by_email(params[:email])
-    raise ActiveRecord::RecordNotFound unless @member.present?
+    if @member.blank?
+      flash[:alert] = 'No user.'
+      return redirect_to edit_todo_list_path(@todo_list)
+    end
 
     ActiveRecord::Base.transaction do
       @todo_list.todo_listships.create!(user: @member, role: :user)

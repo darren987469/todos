@@ -14,11 +14,21 @@
 
         <div class="widget-body">
           <div class="widget-main padding-6">
+            <h4> Settings </h4>
+            <%= form_for @todo_list, html: { class: 'form-inline' } do |f| %>
+              <div class="form-group">
+                <%= f.label :name %>
+                <%= f.text_field :name, class: 'form-control', placeholder: 'Todo list name', required: true %>
+                <input type="submit" class="btn btn-sm btn-primary" value="Rename"/>
+              </div>
+            <% end %>
+            <hr></hr>
+
             <h4> Members </h4>
             <p> Roles are owner, admin, user. Owner can delete list. Admin can invite/delete member.</p>
             <%= form_for @todo_listship, url: todo_list_todo_listships_path(@todo_list), method: :post do |f| %>
               <div class="input-group">
-                <input name="email" type="email" value="user3@gmail.com" placeholder="Memer email..." class="form-control" required="true">
+                <input name="email" type="email" placeholder="Memer email..." class="form-control" required="true">
                 <span class="input-group-btn">
                   <button class="btn btn-sm btn-primary" type="submit">Add Member</button>
                 </span>
@@ -46,9 +56,6 @@
                     <td><%= todo_listship.role %></td>
                     <td>
                       <div class="hidden-sm hidden-xs btn-group">
-                        <button class="btn btn-xs btn-info">
-                          <i class="ace-icon fa fa-pencil bigger-120"></i>
-                        </button>
                         <% if user.id != current_user.id %>
                           <a href="<%= todo_list_todo_listship_path(@todo_list, todo_listship) %>" data-method="delete" class="btn btn-xs btn-danger">
                             <i class="ace-icon fa fa-trash-o bigger-120"></i>
@@ -60,6 +67,7 @@
                 <% end %>
               </tbody>
             </table>
+            <hr></hr>
 
             <h4 class="text-danger">Danger Zone</h4>
             <p><strong>Delete this list.</strong> Todos in this list will also be deleted. Once you delete this list, there is no going back. Please be certain.</p>

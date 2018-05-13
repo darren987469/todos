@@ -164,8 +164,11 @@ class TodoListsContainer extends React.Component {
                 <h1>
                   { currentTodoList.name }
                   <small>
-                    <i className="ace-icon fa fa-angle-double-right"/>
-                    <a href={`/todo_lists/${currentTodoList.id}/edit`}> Settings </a>
+                    <i className="ace-icon fa fa-angle-double-right" style={{ marginRight: '5px' }}/>
+                    <a href={`/todo_lists/${currentTodoList.id}/edit`}>
+                      <i className="fa fa-cog"/>
+                      Settings
+                    </a>
                   </small>
                 </h1>
               </div>
