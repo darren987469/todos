@@ -3,7 +3,7 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable
 
-  has_many :todo_listships, class_name: '::TodoListships'
+  has_many :todo_listships, class_name: '::TodoListship'
   has_many :todo_lists, through: :todo_listships, class_name: '::TodoList'
 
   def full_name
