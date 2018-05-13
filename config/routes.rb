@@ -9,5 +9,6 @@ Rails.application.routes.draw do
 
   resources :todo_lists do
     # resources :todos
+    resources :todo_listships, only: [:create]
   end
 end
