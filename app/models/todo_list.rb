@@ -11,7 +11,7 @@ class TodoList < ApplicationRecord
   def self.build(name:, user:)
     ActiveRecord::Base.transaction do
       todo_list = create!(name: name)
-      todo_list.todo_listships.create!(user: user, role: :admin)
+      todo_list.todo_listships.create!(user: user, role: :owner)
     end
   end
 
