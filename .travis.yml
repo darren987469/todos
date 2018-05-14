@@ -2,4 +2,9 @@ sudo: false
 language: ruby
 rvm:
   - 2.5.0
+services:
+  - postgresql
+addons:
+  postgresql: '9.4'
 before_install: gem install bundler -v 1.16.1
+before_script: psql -c 'create database todo_test; -U postgres'
