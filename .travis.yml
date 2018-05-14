@@ -7,4 +7,5 @@ services:
 addons:
   postgresql: '9.4'
 before_install: gem install bundler -v 1.16.1
-before_script: psql -c 'create database todo_test;' -U postgres
+before_script:
+  - RAILS_ENV=test bundle exec rails db:create
