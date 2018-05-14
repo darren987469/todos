@@ -60,7 +60,7 @@ class TodoListsController < ApplicationController
       user: current_user,
       action: :destroy,
     )
-    ActionCable.server.broadcast(@todo_list.log_tag, action: 'update_todo_list')
+    ActionCable.server.broadcast(@todo_list.log_tag, action: 'destroy_todo_list')
 
     flash[:notice] = "List #{@todo_list.name} is deleted!"
     redirect_to todo_lists_path
