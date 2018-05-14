@@ -14,7 +14,7 @@ class TodoListsController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @todo_list.present?
 
     @todos = @todo_list.todos.active.order(id: :asc)
-    @logs = EventLog.where(tag: @todo_list.log_tag).order(id: :desc).limit(10)
+    @logs = EventLog.where(log_tag: @todo_list.log_tag).order(id: :desc).limit(10)
   end
 
   def edit

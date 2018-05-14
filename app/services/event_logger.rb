@@ -14,7 +14,7 @@ class EventLogger
         resourceable: resource,
         user: user,
         action: action,
-        tag: tag || "#{resource_name}_#{resource.to_param}",
+        log_tag: tag || "#{resource_name}_#{resource.to_param}",
         description: description || "#{user.name} #{action} a #{resource_name}",
         variation: changes
       )
