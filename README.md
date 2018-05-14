@@ -1,24 +1,30 @@
-# README
+# Todos
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Features:
+* Todo list to organize your todo
+* Invite others to join your list
+* Changes to todo is updated through websocket, no need to reload page
 
-Things you may want to cover:
+## System dependencies
 
-* Ruby version
+Tested with Postgres DB.
 
-* System dependencies
+## Installatino
 
-* Configuration
+```shell
+bundle         # install gems
+rails db:setup # create db and seed
+rails s        # start server in http://localhost:300
+```
 
-* Database creation
+# Potential bottleneck and todos
 
-* Database initialization
+The bottleneck of this app maybe rails action cable. It has poor performance when handle a large number of client.
 
-* How to run the test suite
+* Use Background job to reduce response time in controller caused by action cable broadcast.
+* Separate websocket server and application server.
+* If allowed, rewrite websocket server in another language such as Go, Erlang is better choice. Ruby on Rails is not fit for scalable concurrent applications. There is a open source project [AnyCable Rails](https://github.com/anycable/anycable-rails) do this.
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+References:
+* [Action Cable 即時通訊](https://ihower.tw/rails/actioncable.html) by ihower
+* [AnyCable: Action Cable on steroids](https://evilmartians.com/chronicles/anycable-actioncable-on-steroids) by Vladimir Dementyev
