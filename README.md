@@ -1,5 +1,7 @@
 # Todos
-
+[![Build Status](https://travis-ci.org/darren987469/todos.svg?branch=master)](https://travis-ci.org/darren987469/todos)
+[![Maintainability](https://api.codeclimate.com/v1/badges/c21eac6d198364066a7f/maintainability)](https://codeclimate.com/github/darren987469/todos/maintainability)
+[![Coverage Status](https://coveralls.io/repos/github/darren987469/todos/badge.svg?branch=master)](https://coveralls.io/github/darren987469/todos?branch=master)
 Features:
 * Todo list to organize your todo
 * Invite others to join your list
