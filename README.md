@@ -8,18 +8,6 @@ Features:
 * Invite others to join your list
 * Changes to todo is updated through websocket, no need to reload page
 
-## System dependencies
-
-Tested with Postgres DB.
-
-## Install
-
-```shell
-bundle         # install gems
-rails db:setup # create db and seed
-rails s        # start server in http://localhost:300
-```
-
 # Potential bottleneck and todos
 
 The bottleneck of this app maybe rails action cable. It has poor performance when handle a large number of client.
@@ -31,3 +19,21 @@ The bottleneck of this app maybe rails action cable. It has poor performance whe
 References:
 * [Action Cable 即時通訊](https://ihower.tw/rails/actioncable.html) by ihower
 * [AnyCable: Action Cable on steroids](https://evilmartians.com/chronicles/anycable-actioncable-on-steroids) by Vladimir Dementyev
+
+## Environment
+
+Development in Ruby 2.5, PostgreSQL 10.2
+
+## Install
+
+```shell
+bundle         # install gems
+rails db:setup # create db and seed
+rails s        # start server in http://localhost:300
+```
+
+## Testing
+
+```shell
+bin/rspec
+```
