@@ -48,7 +48,7 @@
               <tbody>
                 <%
                   @users.each do |user|
-                    todo_listship = user.todo_listships.first
+                    todo_listship = user.todo_listships.find { |todo_listship| todo_listship.todo_list_id == @todo_list.id }
                 %>
                   <tr>
                     <td><%= user.name %></td>
