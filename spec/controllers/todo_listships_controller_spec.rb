@@ -81,6 +81,15 @@ describe TodoListsController, type: :request do
     context 'when success' do
       it { expect { subject }.to change { TodoListship.count }.by(-1) }
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
+      it do
+        expect(ActionCable.server).to receive(:broadcast).with(
+          todo_list.log_tag,
+          action: 'delete_member',
+          member: { id: member_todo_listship.user_id },
+          todo_list: todo_list
+        )
+        subject
+      end
     end
   end
 end

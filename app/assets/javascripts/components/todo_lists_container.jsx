@@ -2,8 +2,8 @@ class TodoListsContainer extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      todoLists: props.todo_lists,
-      currentTodoList: props.current_todo_list,
+      todoLists: props.todoLists,
+      currentTodoList: props.currentTodoList,
       todos: props.todos,
       logs: props.logs,
       message: null,
@@ -55,6 +55,7 @@ class TodoListsContainer extends React.Component {
 
   received(data){
     console.log('received data', data)
+    const { currentUser } = this.props
     if(data.errors){
       this.showError(data.errors.join(', '))
       return
@@ -82,6 +83,18 @@ class TodoListsContainer extends React.Component {
             </a>
           </div>
         )
+        return
+      case 'delete_member':
+        if(data.member.id === currentUser.id){
+          this.showError(
+            <div>
+              You are disable to access this List.
+              <a href="/todo_lists" style={{ cursor: 'pointer' }}>
+                Refresh.
+              </a>
+            </div>
+          )
+        }
         return
     }
     this.setState(prevState => {
