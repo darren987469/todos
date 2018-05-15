@@ -42,6 +42,12 @@ class TodoListshipsController < ApplicationController
       return redirect_to edit_todo_list_path(@todo_list)
     end
 
+    ActionCable.server.broadcast(@todo_list.log_tag,
+      action: 'delete_member',
+      member: { id: @todo_listship.user_id },
+      todo_list: @todo_list
+    )
+
     @todo_listship.destroy
     redirect_to edit_todo_list_path(@todo_list)
   end

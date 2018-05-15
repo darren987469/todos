@@ -2,11 +2,11 @@ class TodoListsContainer extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      todoLists: props.todo_lists,
-      currentTodoList: props.current_todo_list,
+      todoLists: props.todoLists,
+      currentTodoList: props.currentTodoList,
       todos: props.todos,
       logs: props.logs,
-      error: null
+      message: null,
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -16,6 +16,7 @@ class TodoListsContainer extends React.Component {
     this.nextLogsState = this.nextLogsState.bind(this)
     this.toTop = this.toTop.bind(this)
     this.showError = this.showError.bind(this)
+    this.showMessage = this.showMessage.bind(this)
 
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
@@ -24,7 +25,7 @@ class TodoListsContainer extends React.Component {
   }
 
   componentDidMount(){
-    console.log('componentDidMount')
+    // console.log('componentDidMount')
     this.subscription = App.cable.subscriptions.create({
       channel: 'TodoListChannel', id: this.state.currentTodoList.id
     },
@@ -41,29 +42,20 @@ class TodoListsContainer extends React.Component {
   }
 
   connected(){
-    console.log('connected')
+    // console.log('connected')
   }
 
   disconnected(){
-    console.log('disconnected')
+    // console.log('disconnected')
   }
 
   rejected(){
-    console.log('rejected')
+    // console.log('rejected')
   }
-  test(){
-    this.setState({
-      error:
-        <div>
-          The page is outdated.
-          <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
-            Refresh.
-          </a>
-        </div>
-    })
-  }
+
   received(data){
-    console.log('received data', data)
+    // console.log('received data', data)
+    const { currentUser } = this.props
     if(data.errors){
       this.showError(data.errors.join(', '))
       return
@@ -91,6 +83,18 @@ class TodoListsContainer extends React.Component {
             </a>
           </div>
         )
+        return
+      case 'delete_member':
+        if(data.member.id === currentUser.id){
+          this.showError(
+            <div>
+              You are disable to access this List.
+              <a href="/todo_lists" style={{ cursor: 'pointer' }}>
+                Refresh.
+              </a>
+            </div>
+          )
+        }
         return
     }
     this.setState(prevState => {
@@ -124,8 +128,13 @@ class TodoListsContainer extends React.Component {
     })
   }
 
-  showError(error){
-    this.setState({ error: error })
+  showError(content){
+    this.setState({ message: { type: 'error', content: content } })
+    this.toTop()
+  }
+
+  showMessage(content){
+    this.setState({ message: { type: 'info', content: content } })
     this.toTop()
   }
 
@@ -155,18 +164,18 @@ class TodoListsContainer extends React.Component {
   }
 
   request(method, params = {}, options = {}){
-    console.log('request method:', method)
+    // console.log('request method:', method)
     const data = Object.assign(
       { method: method },
       { todo_list_id: this.state.currentTodoList.id },
       params
     )
-    console.log('request data:', data)
+    // console.log('request data:', data)
     this.subscription.perform('request', data)
   }
 
   render() {
-    const { currentTodoList, todoLists, todos, logs, error } = this.state
+    const { currentTodoList, todoLists, todos, logs, message } = this.state
     const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
       <div className="main-container">
@@ -211,17 +220,8 @@ class TodoListsContainer extends React.Component {
 
               <div className="row" style={{ height: '500px'}}>
 
-                {/* Error Message Block */}
-                {
-                  error &&
-                  <div className="alert alert-block alert-danger">
-                    <a className="close" onClick={() => this.setState({ error: null })}>
-                      <i className="ace-icon fa fa-times"></i>
-                    </a>
-                    { error }
-                  </div>
-                }
-                {/* Error Message */}
+                {/* Message Block */}
+                { message && <MessageBlock message={ message } onDismiss={() => this.setState({ message: null })}/> }
 
                 <div className="col-sm-6">
                   <div className="dd">
@@ -286,179 +286,4 @@ TodoListsContainer.propTypes = {
   todo_list_id: PropTypes.number,
   todos: PropTypes.array.isRequired,
   logs: PropTypes.array.isRequired
-}
-
-class Todo extends React.Component {
-  constructor(props){
-    super(props)
-    this.state = {
-      mode: 'show', // or 'edit'
-      description: props.todo.description,
-      descriptionWas: props.todo.description,
-    }
-    this.handleUpdate = this.handleUpdate.bind(this)
-    this.handleArchive = this.handleArchive.bind(this)
-    this.renderShow = this.renderShow.bind(this)
-    this.renderEdit = this.renderEdit.bind(this)
-  }
-
-  handleUpdate(){
-    const { todo, patchTodoRequest } = this.props
-    patchTodoRequest(
-      todo.id,
-      { description: this.state.description },
-      /* for ajax callback
-        (res, textStatus, xhr) => {
-          if(xhr.status == 200)
-            this.setState({ mode: 'show' })
-        }
-      */
-    )
-    // for websocket callback
-    this.setState({ mode: 'show' })
-  }
-
-  handleArchive(){
-    const { todo, patchTodoRequest } = this.props
-    patchTodoRequest(todo.id, { archived_at: new Date() })
-  }
-
-  renderShow(){
-    const { todo, patchTodoRequest, destroyTodoRequest } = this.props
-    return(
-      <li className="dd-item">
-        <div className="dd-handle">
-          <label style={{ marginRight: '5px' }}>
-            <input
-              name="complete"
-              type="checkbox"
-              className="ace"
-              checked={ todo.complete }
-              onChange={ () => {
-                patchTodoRequest(todo.id, { complete: !todo.complete })
-              }}
-            />
-            <span className="lbl"></span>
-          </label>
-          { todo.complete ? <s>{ todo.description }</s> : todo.description }
-          <div className="pull-right action-buttons">
-            {
-              !todo.complete &&
-              <a className="blue" onClick={() => this.setState({ mode: 'edit' })} title="edit">
-                <i className="ace-icon fa fa-pencil bigger-150"></i>
-              </a>
-            }
-            {
-              todo.complete &&
-              <a className="brown" onClick={this.handleArchive} title="archive">
-                <i className="ace-icon fa fa-archive bigger-150"></i>
-              </a>
-            }
-            <a className="red" onClick={() => destroyTodoRequest(todo.id)} title="delete">
-              <i className="ace-icon fa fa-trash-o bigger-150"></i>
-            </a>
-          </div>
-        </div>
-      </li>
-    )
-  }
-
-  renderEdit(){
-    const { todo, patchTodoRequest, destroyTodoRequest } = this.props
-    return(
-      <li className="dd-item">
-        <div className="dd-handle">
-          <label style={{ marginRight: '5px' }}>
-            <input
-              name="complete"
-              type="checkbox"
-              className="ace"
-              checked={ todo.complete }
-              onChange={ e => {
-                patchTodoRequest(todo.id, { complete: e.target.value })
-              }}
-            />
-            <span className="lbl"></span>
-          </label>
-          <input
-            type="text"
-            className="input-xlarge"
-            value={this.state.description}
-            onChange={event => this.setState({ description: event.target.value })}
-          />
-          <div className="pull-right action-buttons">
-            <a className="green" onClick={this.handleUpdate}>
-              <i className="ace-icon fa fa-check bigger-150"></i>
-            </a>
-            <a className="red" onClick={() => this.setState({ mode: 'show' })}>
-              <i className="ace-icon fa fa-times bigger-150"></i>
-            </a>
-          </div>
-        </div>
-      </li>
-    )
-  }
-
-  render(){
-    return(
-      this.state.mode === 'show' ? this.renderShow() : this.renderEdit()
-    )
-  }
-}
-
-class Log extends React.Component{
-  constructor(props){
-    super(props)
-    this.state = {
-      created_at: this.formatCreatedAt(),
-    }
-  }
-
-  componentDidMount(){
-    this.timerId = setInterval(() => this.tick(), 1000)
-  }
-
-  componentWillUnmount(){
-    clearInterval(this.timerId)
-    this.timerId = null
-  }
-
-  tick(){
-    if(this.timerId)
-      this.setState({ created_at: this.formatCreatedAt() })
-  }
-
-  formatCreatedAt(){
-    return(moment(this.props.log.created_at).fromNow())
-  }
-
-  renderDetail(log) {
-    const changes = log.variation
-    return `id: ${log.resourceable_id}` + (changes ?
-      ', ' + Object.keys(changes).map(attribute => `${attribute}: ${changes[attribute][0]} => ${changes[attribute][1]}`).join(', ') : '')
-  }
-
-  render(){
-    const { log } = this.props
-    const { showDetail } = this.state
-    return(
-      <div className="profile-activity clearfix">
-        <div>
-          { log.description }
-          <a>
-            {
-              log.variation ?
-              <span title={this.renderDetail(log)}> Detail </span> : ''
-            }
-            {/* <b className="arrow fa fa-angle-down"></b> */}
-          </a>
-
-          <div className="time">
-            <i className="ace-icon fa fa-clock-o bigger-110" style={{ marginRight: '5px' }}/>
-            { this.state.created_at }
-          </div>
-        </div>
-      </div>
-    )
-  }
 }
