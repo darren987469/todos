@@ -29,22 +29,21 @@ class TodoListshipsController < ApplicationController
   end
 
   def destroy
-    @todo_listship = TodoListship.find(params[:id])
+    @todo_list = current_user.todo_lists.find(params[:todo_list_id])
+    @todo_listship = @todo_list.todo_listships.find(params[:id])
     if @todo_listship.user_id == current_user.id
       flash[:alert] = 'You cannot delete yourself.'
-      return redirect_to edit_todo_list_path(params[:todo_list_id])
+      return redirect_to edit_todo_list_path(@todo_list)
     end
 
-    current_user_role = TodoListship.where(user: current_user, todo_list_id: params[:todo_list_id]).first&.role
-    raise ActiveRecord::RecordNotFound unless current_user_role.present?
-
+    current_user_role = current_user.role_of(@todo_list)
     unless permission_of(current_user_role) > permission_of(@todo_listship.role)
       flash[:alert] = 'You cannot delete this member.'
-      return redirect_to edit_todo_list_path(params[:todo_list_id])
+      return redirect_to edit_todo_list_path(@todo_list)
     end
 
     @todo_listship.destroy
-    redirect_to edit_todo_list_path(params[:todo_list_id])
+    redirect_to edit_todo_list_path(@todo_list)
   end
 
   private
