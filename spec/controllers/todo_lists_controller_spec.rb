@@ -48,7 +48,7 @@ describe TodoListsController, type: :request do
         todo_lists = user.todo_lists
         expect(assigns(:todo_lists)).to eq todo_lists
         expect(assigns(:todos)).to eq todo_lists.first.todos.active.order(id: :asc)
-        expect(assigns(:logs)).to eq EventLog.where(tag: todo_lists.first.log_tag).order(id: :desc).limit(10)
+        expect(assigns(:logs)).to eq EventLog.where(log_tag: todo_lists.first.log_tag).order(id: :desc).limit(10)
       end
     end
   end
