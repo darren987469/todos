@@ -6,7 +6,7 @@ class TodoListsContainer extends React.Component {
       currentTodoList: props.current_todo_list,
       todos: props.todos,
       logs: props.logs,
-      error: null
+      message: null,
     }
     this.connected = this.connected.bind(this)
     this.disconnected = this.disconnected.bind(this)
@@ -16,6 +16,7 @@ class TodoListsContainer extends React.Component {
     this.nextLogsState = this.nextLogsState.bind(this)
     this.toTop = this.toTop.bind(this)
     this.showError = this.showError.bind(this)
+    this.showMessage = this.showMessage.bind(this)
 
     this.createTodoRequest = this.createTodoRequest.bind(this)
     this.patchTodoRequest = this.patchTodoRequest.bind(this)
@@ -51,17 +52,7 @@ class TodoListsContainer extends React.Component {
   rejected(){
     console.log('rejected')
   }
-  test(){
-    this.setState({
-      error:
-        <div>
-          The page is outdated.
-          <a onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
-            Refresh.
-          </a>
-        </div>
-    })
-  }
+
   received(data){
     console.log('received data', data)
     if(data.errors){
@@ -124,8 +115,13 @@ class TodoListsContainer extends React.Component {
     })
   }
 
-  showError(error){
-    this.setState({ error: error })
+  showError(content){
+    this.setState({ message: { type: 'error', content: content } })
+    this.toTop()
+  }
+
+  showMessage(content){
+    this.setState({ message: { type: 'info', content: content } })
     this.toTop()
   }
 
@@ -166,7 +162,7 @@ class TodoListsContainer extends React.Component {
   }
 
   render() {
-    const { currentTodoList, todoLists, todos, logs, error } = this.state
+    const { currentTodoList, todoLists, todos, logs, message } = this.state
     const { createTodoRequest, patchTodoRequest, destroyTodoRequest } = this
     return(
       <div className="main-container">
@@ -211,17 +207,8 @@ class TodoListsContainer extends React.Component {
 
               <div className="row" style={{ height: '500px'}}>
 
-                {/* Error Message Block */}
-                {
-                  error &&
-                  <div className="alert alert-block alert-danger">
-                    <a className="close" onClick={() => this.setState({ error: null })}>
-                      <i className="ace-icon fa fa-times"></i>
-                    </a>
-                    { error }
-                  </div>
-                }
-                {/* Error Message */}
+                {/* Message Block */}
+                { message && <MessageBlock message={ message } onDismiss={() => this.setState({ message: null })}/> }
 
                 <div className="col-sm-6">
                   <div className="dd">
