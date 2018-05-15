@@ -25,7 +25,7 @@ class TodoListsContainer extends React.Component {
   }
 
   componentDidMount(){
-    console.log('componentDidMount')
+    // console.log('componentDidMount')
     this.subscription = App.cable.subscriptions.create({
       channel: 'TodoListChannel', id: this.state.currentTodoList.id
     },
@@ -42,19 +42,19 @@ class TodoListsContainer extends React.Component {
   }
 
   connected(){
-    console.log('connected')
+    // console.log('connected')
   }
 
   disconnected(){
-    console.log('disconnected')
+    // console.log('disconnected')
   }
 
   rejected(){
-    console.log('rejected')
+    // console.log('rejected')
   }
 
   received(data){
-    console.log('received data', data)
+    // console.log('received data', data)
     const { currentUser } = this.props
     if(data.errors){
       this.showError(data.errors.join(', '))
@@ -164,13 +164,13 @@ class TodoListsContainer extends React.Component {
   }
 
   request(method, params = {}, options = {}){
-    console.log('request method:', method)
+    // console.log('request method:', method)
     const data = Object.assign(
       { method: method },
       { todo_list_id: this.state.currentTodoList.id },
       params
     )
-    console.log('request data:', data)
+    // console.log('request data:', data)
     this.subscription.perform('request', data)
   }
 
