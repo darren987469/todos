@@ -6,7 +6,8 @@
 Features:
 * Todo list to organize your todos
 * Invite other people to join your list
-* Changes to todo is updated through websocket, no need to reload page
+* Changes to todo are updated through websocket, no need to reload page
+* Every user action is logged and displayed
 
 ## Screen shot
 ![Todo screenshot](/screenshots/Screen_Shot_2018-05-15.png?raw=true)
