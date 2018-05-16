@@ -12,6 +12,7 @@ class TodoList < ApplicationRecord
     ActiveRecord::Base.transaction do
       todo_list = create!(name: name)
       todo_list.todo_listships.create!(user: user, role: :owner)
+      todo_list
     end
   end
 

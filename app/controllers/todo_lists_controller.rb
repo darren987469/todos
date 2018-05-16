@@ -3,7 +3,7 @@ class TodoListsController < ApplicationController
 
   def index
     @todo_list = current_user.todo_lists.first
-    @todo_list = current_user.todo_lists.create(name: 'New Todo List') if @todo_list.blank?
+    @todo_list = TodoList.build(name: 'New Todo List', user: current_user) if @todo_list.blank?
 
     redirect_to todo_list_path(@todo_list)
   end
