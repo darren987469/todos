@@ -207,14 +207,14 @@ class TodoListsContainer extends React.Component {
             <div className="page-content">
               <div className="page-header">
                 <h1>
-                  { currentTodoList.name }
-                  <small>
-                    <i className="ace-icon fa fa-angle-double-right" style={{ marginRight: '5px' }}/>
+                  <strong> { currentTodoList.name } </strong>
+                  <strong style={{ fontSize: '18px' }}>
+                    <i className="ace-icon fa fa-angle-double-right" style={{ margin: '0px 5px' }}/>
                     <a href={`/todo_lists/${currentTodoList.id}/edit`}>
-                      <i className="fa fa-cog"/>
                       Settings
+                      <i className="ace-icon blue fa fa-pencil-square-o" style={{ marginLeft: '5px' }}/>
                     </a>
-                  </small>
+                  </strong>
                 </h1>
               </div>
 
