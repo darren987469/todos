@@ -1,11 +1,25 @@
 class TodoListsController < ApplicationController
-  before_action :authenticate_user!
+  # before_action :authenticate_user!
 
-  def index
-    @todo_list = current_user.todo_lists.first
-    @todo_list = TodoList.build(name: 'New Todo List', user: current_user) if @todo_list.blank?
+  # POST /products#report
+  def report
+    # params format
+    # {
+    #   vendor: string, vendor name
+    #   id: integer, product id
+    #   name: string, product name
+    #   quantity: integer
+    #   price: integer
+    #   img: string, image link to product
+    # }
+    @products = params[:products]
 
-    redirect_to todo_list_path(@todo_list)
+    @product = @products.sample
+    # I need description and link to products
+    @product[:link] = 'http://localhost:3000'
+    @product[:info] = 'You can buy this with $1 in honestbee'
+
+    render json: { products: [@product] }
   end
 
   def show
