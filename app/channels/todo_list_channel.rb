@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class TodoListChannel < ApplicationCable::Channel
   attr_reader :params
 
   class UnknownAction < StandardError; end
   class NotAuthorizedError < StandardError; end
 
-  VALID_ACTION = %w( create_todo_list update_todo_list destroy_todo_list
-    create_todo update_todo destroy_todo )
+  VALID_ACTION = %w[ create_todo_list update_todo_list destroy_todo_list
+                     create_todo update_todo destroy_todo ].freeze
 
   def subscribed
     todo_list = TodoList.find(params[:id])
@@ -18,7 +20,7 @@ class TodoListChannel < ApplicationCable::Channel
     @action = params[:method]
     raise UnknownAction unless VALID_ACTION.include?(@action)
 
-    self.send(@action)
+    send(@action)
   rescue ActiveRecord::RecordNotFound
     broadcast_errors(['RecordNotFound'])
   rescue NotAuthorizedError
@@ -32,7 +34,7 @@ class TodoListChannel < ApplicationCable::Channel
 
   def create_todo_list
     ActiveRecord::Base.transaction do
-      @todo_list = TodoList.new(name: "List #{current_user.todo_lists.count + 1}",)
+      @todo_list = TodoList.new(name: "List #{current_user.todo_lists.count + 1}")
       if @todo_list.save
         @todo_list.todo_listships.create!(user: current_user, role: :owner)
       end
@@ -82,12 +84,11 @@ class TodoListChannel < ApplicationCable::Channel
 
   def broadcast(resource)
     ActionCable.server.broadcast(@stream_token,
-      action: @action,
-      todo_list: @todo_list,
-      todo: @todo,
-      log: @log,
-      errors: resource.errors.messages.presence
-    )
+                                 action: @action,
+                                 todo_list: @todo_list,
+                                 todo: @todo,
+                                 log: @log,
+                                 errors: resource.errors.messages.presence)
     clear_assigned_instance_variables!
   end
 
@@ -98,8 +99,10 @@ class TodoListChannel < ApplicationCable::Channel
 
   # make sure not to access outdated data
   def clear_assigned_instance_variables!
-    @params, @action = nil, nil
-    @todo_list, @todo = nil, nil
+    @params = nil
+    @action = nil
+    @todo_list = nil
+    @todo = nil
     @log = nil
   end
 
@@ -122,7 +125,7 @@ class TodoListChannel < ApplicationCable::Channel
       action: resource_action,
       description: description,
       tag: tag || @todo_list ? @todo_list.log_tag : "todo_list_#{@todo.todo_list_id}",
-      changes: changes,
+      changes: changes
     )
   end
 end

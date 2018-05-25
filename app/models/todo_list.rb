@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TodoList < ApplicationRecord
   has_many :todos, dependent: :delete_all
   has_many :logs, as: :resourceable, class_name: 'EventLog'

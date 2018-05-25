@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class EventLogger
-  VALID_ACTION = %w( create update destroy archive )
+  VALID_ACTION = %w[create update destroy archive].freeze
 
   class << self
     # == Example usage:
@@ -7,7 +9,7 @@ class EventLogger
     #   EventLogger.log(resource: todo, user: current_user, action: :create)
     #   => #<EventLog id: 1, resourceable_type: "Todo", resourceable_id: 1, user_id: 1, tag: "todo_1", action: "create", description: "Someone create a todo", variation: nil, ...>
     def log(resource:, user:, action:, tag: nil, description: nil, changes: nil)
-      raise ArgumentError.new('Invalid Action') unless VALID_ACTION.include?(action.to_s)
+      raise ArgumentError, 'Invalid Action' unless VALID_ACTION.include?(action.to_s)
 
       resource_name = resource.class.name.underscore
       EventLog.create!(

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class TodoListsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_todo_list, only: [:show, :edit, :update, :destroy]
+  before_action :set_todo_list, only: %i[show edit update destroy]
   before_action :check_update_permission, only: [:update]
   before_action :check_destroy_permission, only: [:destroy]
 
@@ -42,7 +44,7 @@ class TodoListsController < ApplicationController
     @log = EventLogger.log(
       resource: @todo_list,
       user: current_user,
-      action: :destroy,
+      action: :destroy
     )
     ActionCable.server.broadcast(@todo_list.log_tag, action: 'destroy_todo_list')
 
@@ -51,26 +53,27 @@ class TodoListsController < ApplicationController
   end
 
   private
-    def todo_list_params
-      params.require(:todo_list).permit(:name)
-    end
 
-    def set_todo_list
-      @todo_list = current_user.todo_lists.find(params[:id])
-    end
+  def todo_list_params
+    params.require(:todo_list).permit(:name)
+  end
 
-    def check_update_permission
-      current_user_role = current_user.role_of(@todo_list)
-      unless (current_user_role.owner? || current_user_role.admin?)
-        flash[:alert] = 'You cannot update this todo list.'
-        return redirect_to edit_todo_list_path(@todo_list)
-      end
-    end
+  def set_todo_list
+    @todo_list = current_user.todo_lists.find(params[:id])
+  end
 
-    def check_destroy_permission
-      unless current_user.role_of(@todo_list).owner?
-        flash[:alert] = 'You cannot delete this todo list.'
-        return redirect_to edit_todo_list_path(@todo_list)
-      end
+  def check_update_permission
+    current_user_role = current_user.role_of(@todo_list)
+    unless current_user_role.owner? || current_user_role.admin?
+      flash[:alert] = 'You cannot update this todo list.'
+      return redirect_to edit_todo_list_path(@todo_list)
     end
+  end
+
+  def check_destroy_permission
+    unless current_user.role_of(@todo_list).owner?
+      flash[:alert] = 'You cannot delete this todo list.'
+      redirect_to edit_todo_list_path(@todo_list)
+    end
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe TodoListsController, type: :request do
@@ -24,7 +26,7 @@ describe TodoListsController, type: :request do
       before { user.todo_listships.first.update(role: :user) }
 
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body) .to include 'You cannot add member'  }
+      it { subject; follow_redirect!; expect(response.body) .to include 'You cannot add member' }
     end
 
     context 'when cannot find member by email' do

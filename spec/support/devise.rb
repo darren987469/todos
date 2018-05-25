@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'devise'
 require 'support/controller_macros'
 require 'support/request_spec_helper'

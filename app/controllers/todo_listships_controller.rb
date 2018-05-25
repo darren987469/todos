@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TodoListshipsController < ApplicationController
   before_action :set_todo_list
   before_action :set_todo_listship, only: [:destroy]
@@ -27,46 +29,46 @@ class TodoListshipsController < ApplicationController
 
   def destroy
     ActionCable.server.broadcast(@todo_list.log_tag,
-      action: 'delete_member',
-      member: { id: @todo_listship.user_id },
-      todo_list: @todo_list
-    )
+                                 action: 'delete_member',
+                                 member: { id: @todo_listship.user_id },
+                                 todo_list: @todo_list)
 
     @todo_listship.destroy
     redirect_to edit_todo_list_path(@todo_list)
   end
 
   private
-    def permission_of(role)
-      TodoListship.roles[role]
+
+  def permission_of(role)
+    TodoListship.roles[role]
+  end
+
+  def set_todo_list
+    @todo_list = current_user.todo_lists.find(params[:todo_list_id])
+  end
+
+  def set_todo_listship
+    @todo_listship = @todo_list.todo_listships.find(params[:id])
+  end
+
+  def check_create_permission
+    current_user_role = current_user.role_of(@todo_list)
+    unless current_user_role.admin? || current_user_role.owner?
+      flash[:alert] = 'You cannot add member.'
+      return redirect_to edit_todo_list_path(@todo_list)
+    end
+  end
+
+  def check_destroy_permission
+    if @todo_listship.user_id == current_user.id
+      flash[:alert] = 'You cannot delete yourself.'
+      return redirect_to edit_todo_list_path(@todo_list)
     end
 
-    def set_todo_list
-      @todo_list = current_user.todo_lists.find(params[:todo_list_id])
+    current_user_role = current_user.role_of(@todo_list)
+    unless permission_of(current_user_role) > permission_of(@todo_listship.role)
+      flash[:alert] = 'You cannot delete this member.'
+      return redirect_to edit_todo_list_path(@todo_list)
     end
-
-    def set_todo_listship
-      @todo_listship = @todo_list.todo_listships.find(params[:id])
-    end
-
-    def check_create_permission
-      current_user_role = current_user.role_of(@todo_list)
-      unless (current_user_role.admin? || current_user_role.owner?)
-        flash[:alert] = 'You cannot add member.'
-        return redirect_to edit_todo_list_path(@todo_list)
-      end
-    end
-
-    def check_destroy_permission
-      if @todo_listship.user_id == current_user.id
-        flash[:alert] = 'You cannot delete yourself.'
-        return redirect_to edit_todo_list_path(@todo_list)
-      end
-
-      current_user_role = current_user.role_of(@todo_list)
-      unless permission_of(current_user_role) > permission_of(@todo_listship.role)
-        flash[:alert] = 'You cannot delete this member.'
-        return redirect_to edit_todo_list_path(@todo_list)
-      end
-    end
+  end
 end

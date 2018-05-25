@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe TodoListsController, type: :request do
@@ -37,7 +39,7 @@ describe TodoListsController, type: :request do
 
     context 'when todo list not belongs to user' do
       before { @todo_list = create(:todo_list) }
-      it { expect{ subject }.to raise_error ActiveRecord::RecordNotFound }
+      it { expect { subject }.to raise_error ActiveRecord::RecordNotFound }
     end
 
     context 'when todo list belongs to user' do
