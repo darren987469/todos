@@ -45,3 +45,10 @@ Follow [git flow](http://nvie.com/posts/a-successful-git-branching-model/).
 ```shell
 bin/rspec
 ```
+
+## Deploy to Heroku
+
+```sh
+# heroku remote: https://git.heroku.com/todos-actioncable.git
+git push heroku master
+```
