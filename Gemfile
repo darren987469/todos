@@ -42,6 +42,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 gem 'devise'
 
 gem 'jquery-rails'
+gem 'kaminari'
 gem 'momentjs-rails'
 gem 'react-rails'
 
