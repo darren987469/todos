@@ -36,6 +36,7 @@ gem 'turbolinks', '~> 5'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+gem 'awesome_rails_console'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 
@@ -50,10 +51,8 @@ gem 'react-rails'
 gem 'coveralls', require: false
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
   gem 'factory_bot'
-  gem 'pry'
+  gem 'pry-byebug'
   gem 'rspec-rails'
 end
 
