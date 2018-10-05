@@ -26,7 +26,12 @@ References:
 
 ## Environment
 
-Development in Ruby 2.5, PostgreSQL 10.2
+Development in Ruby 2.5.1, PostgreSQL 10.2, elasticsearch 6.4.2
+
+```sh
+brew cask install homebrew/cask-versions/java8 # elasticsearch dependency
+brew install elasticsearch
+```
 
 ## Install
 
