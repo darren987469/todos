@@ -40,7 +40,8 @@ gem 'turbolinks', '~> 5'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'devise'
-
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
 gem 'jquery-rails'
 gem 'kaminari'
 gem 'momentjs-rails'
