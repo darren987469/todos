@@ -9,6 +9,8 @@ Features:
 * Changes to todo are updated through websocket, no need to reload page
 * Every user action is logged and displayed
 
+Detail spec can be found in [System Spec](system_spec.md)
+
 ## Screen shot
 ![Todo screenshot](/screenshots/Screen_Shot_2018-05-15.png?raw=true)
 
