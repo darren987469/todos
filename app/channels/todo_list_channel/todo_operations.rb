@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TodoListChannel
   class TodoOperations < BaseOperations
     def create

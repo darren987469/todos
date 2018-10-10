@@ -50,7 +50,8 @@ describe TodoListsController, type: :request do
         todo_lists = user.todo_lists
         expect(assigns(:todo_lists)).to eq todo_lists
         expect(assigns(:todos)).to eq todo_lists.first.todos.active.order(id: :asc)
-        expect(assigns(:logs)).to eq EventLog.where(log_tag: todo_lists.first.log_tag).order(id: :desc).limit(10)
+        expected_logs = EventLog.where(log_tag: todo_lists.first.log_tag).order(id: :desc).limit(10)
+        expect(assigns(:logs)).to eq expected_logs
       end
     end
   end
@@ -64,7 +65,8 @@ describe TodoListsController, type: :request do
 
   describe 'PATCH /todo_lists/:id' do
     let(:todo_list) { @todo_list }
-    subject { patch "/todo_lists/#{@todo_list.id}", params: { todo_list: { name: 'updated_name' } } }
+    let(:endpoint) { "/todo_lists/#{@todo_list.id}" }
+    subject { patch endpoint, params: { todo_list: { name: 'updated_name' } } }
 
     context 'when user are not owner or admin of todo list' do
       before { @todo_list = create_todo_list(role: :user) }
@@ -81,9 +83,19 @@ describe TodoListsController, type: :request do
       end
 
       it { expect { subject }.to change { EventLog.count }.by(1) }
-      it { expect(ActionCable.server).to receive(:broadcast).with(todo_list.log_tag, action: 'update_todo_list'); subject }
+      it do
+        expect(ActionCable.server).to receive(:broadcast).with(
+          todo_list.log_tag,
+          action: 'update_todo_list'
+        )
+        subject
+      end
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body).to include 'Name is updated!' }
+      it do
+        subject
+        follow_redirect!
+        expect(response.body).to include 'Name is updated!'
+      end
     end
   end
 
@@ -104,9 +116,20 @@ describe TodoListsController, type: :request do
 
       it { expect { subject }.to change { TodoList.count }.by(-1) }
       it { expect { subject }.to change { EventLog.count }.by(1) }
-      it { expect(ActionCable.server).to receive(:broadcast).with(todo_list.log_tag, action: 'destroy_todo_list'); subject }
+      it do
+        expect(ActionCable.server).to receive(:broadcast).with(
+          todo_list.log_tag,
+          action: 'destroy_todo_list'
+        )
+        subject
+      end
       it { expect(subject).to redirect_to todo_lists_path }
-      it { subject; follow_redirect!; follow_redirect!; expect(response.body).to include "List #{@todo_list.name} is deleted!" }
+      it do
+        subject
+        follow_redirect!
+        follow_redirect!
+        expect(response.body).to include "List #{@todo_list.name} is deleted!"
+      end
     end
   end
 end

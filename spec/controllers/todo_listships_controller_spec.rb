@@ -26,13 +26,25 @@ describe TodoListsController, type: :request do
       before { user.todo_listships.first.update(role: :user) }
 
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body) .to include 'You cannot add member' }
+
+      it 'renders correctly after redirect' do
+        subject
+        follow_redirect!
+        expect(response.body).to include 'You cannot add member'
+      end
     end
 
     context 'when cannot find member by email' do
-      subject { post "/todo_lists/#{todo_list.id}/todo_listships", params: { email: 'no_exist_email' } }
+      let(:params) { { email: 'no_exist_email' } }
+
+      subject { post "/todo_lists/#{todo_list.id}/todo_listships", params: params }
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body).to include 'No user.' }
+
+      it 'renders correctly after redirect' do
+        subject
+        follow_redirect!
+        expect(response.body).to include 'No user.'
+      end
     end
 
     context 'when success' do
@@ -59,7 +71,9 @@ describe TodoListsController, type: :request do
   end
 
   describe 'DELETE /todo_lists/:todo_list_id/todo_listships/:id' do
-    let!(:member_todo_listship) { create(:todo_listship, user: member, todo_list: todo_list, role: :user) }
+    let!(:member_todo_listship) do
+      create(:todo_listship, user: member, todo_list: todo_list, role: :user)
+    end
 
     context 'when current_user delete self from todo list' do
       subject do
@@ -68,16 +82,26 @@ describe TodoListsController, type: :request do
       end
 
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body).to include 'You cannot delete yourself.' }
+
+      it 'renders correctly after redirect' do
+        subject
+        follow_redirect!
+        expect(response.body).to include 'You cannot delete yourself.'
+      end
     end
 
     subject { delete "/todo_lists/#{todo_list.id}/todo_listships/#{member_todo_listship.id}" }
 
-    context 'when current_user has no permission(member role is qual or greater than current_user)' do
+    context 'when current_user has no permission(member role >= current_user)' do
       before { member_todo_listship.update(role: :owner) }
 
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it { subject; follow_redirect!; expect(response.body).to include 'You cannot delete this member.' }
+
+      it 'renders correctly after redirect' do
+        subject
+        follow_redirect!
+        expect(response.body).to include 'You cannot delete this member.'
+      end
     end
 
     context 'when success' do

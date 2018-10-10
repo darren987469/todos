@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TodoListChannel
   class TodoListOperations < BaseOperations
     def create
@@ -37,7 +39,7 @@ class TodoListChannel
         action: channel_action,
         todo_list: todo_list,
         log: log,
-        errors: todo_list.errors.blank? ? nil: todo_list.errors.messages
+        errors: todo_list.errors.blank? ? nil : todo_list.errors.messages
       )
     end
   end

@@ -27,7 +27,7 @@ class TodoListChannel < ApplicationCable::Channel
     broadcast_errors(['RecordNotFound'])
   rescue NotAuthorizedError
     broadcast_errors(['Forbidden'])
-  rescue StandardError => e
+  rescue StandardError => _e
     broadcast_errors(['500 Error'])
     raise if Rails.env.development?
   end
