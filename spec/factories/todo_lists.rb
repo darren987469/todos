@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :todo_list do
-    name 'list'
+    name { 'list' }
   end
 end
