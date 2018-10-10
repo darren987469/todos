@@ -46,6 +46,7 @@ gem 'jquery-rails'
 gem 'kaminari'
 gem 'momentjs-rails'
 gem 'react-rails'
+gem 'rubocop', require: false
 
 # test coverage
 gem 'coveralls', require: false
