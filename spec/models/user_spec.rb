@@ -4,7 +4,9 @@ require 'rails_helper'
 
 describe User, type: :model do
   let(:todo_list) { create(:todo_list) }
-  let(:user) { create(:user, email: 'some@gmail.com', first_name: 'First name', last_name: 'Last name') }
+  let(:user) do
+    create(:user, email: 'some@gmail.com', first_name: 'First name', last_name: 'Last name')
+  end
 
   shared_examples 'full_name' do |method|
     subject { user.send(method) }

@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :todo do
-    description 'todo'
+    description { 'todo' }
   end
 end

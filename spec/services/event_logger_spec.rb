@@ -43,7 +43,7 @@ describe EventLogger do
 
       it { expect(subject.log_tag).to eq "todo_list_#{todo_list.id}" }
       it { expect(subject.description).to eq "#{user.name} create a todo_list" }
-      it { expect(subject.variation).to be_nil }
+      it { expect(subject.variation).to eq({}) }
     end
   end
 end

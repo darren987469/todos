@@ -46,6 +46,7 @@ gem 'jquery-rails'
 gem 'kaminari'
 gem 'momentjs-rails'
 gem 'react-rails'
+gem 'rubocop', require: false
 
 # test coverage
 gem 'coveralls', require: false
@@ -74,6 +75,7 @@ group :test do
   gem 'database_cleaner'
   gem 'rails-controller-testing'
   gem 'rspec'
+  gem 'timecop'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

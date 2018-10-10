@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :todo_listship do
-    role 'user'
+    role { 'user' }
   end
 end

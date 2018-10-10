@@ -147,8 +147,8 @@ class TodoListsContainer extends React.Component {
     return this.state.logs.concat(newLog).sort((a, b) => b.id - a.id)
   }
 
-  createTodoListRequest(){
-    this.request('create_todo_list')
+  createTodoListRequest(name){
+    this.request('create_todo_list', { name: 'New List' })
   }
 
   createTodoRequest(description){
