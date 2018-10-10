@@ -86,7 +86,9 @@ describe TodoListChannel::TodoOperations do
         Timecop.freeze(now = Time.current) do
           params[:todo][:archived_at] = now
 
-          expect { subject }.to change { todo.reload.archived_at }.from(nil).to(now)
+          expect(todo.archived_at).to eq nil
+          subject
+          expect(todo.reload.archived_at.to_i).to eq now.to_i
         end
       end
     end
