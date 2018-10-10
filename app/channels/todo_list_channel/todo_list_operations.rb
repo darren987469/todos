@@ -12,16 +12,6 @@ class TodoListChannel
       end
     end
 
-    def destroy
-      todo_list = current_user.todo_lists.find(params[:id])
-      raise NotAuthorizedError unless todo_list.owner == current_user
-
-      todo_list.destroy
-
-      log = create_log!(todo_list)
-      broadcast(todo_list, log)
-    end
-
     private
 
     def create_log!(todo_list)

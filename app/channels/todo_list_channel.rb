@@ -18,7 +18,7 @@ class TodoListChannel < ApplicationCable::Channel
     case params[:method]
     when 'create_todo', 'update_todo', 'destroy_todo'
       TodoOperations.new(@stream_token, current_user, @params).dispatch
-    when 'create_todo_list', 'update_todo_list', 'destroy_todo_list'
+    when 'create_todo_list'
       TodoListOperations.new(@stream_token, current_user, @params).dispatch
     else
       raise UnknownAction
