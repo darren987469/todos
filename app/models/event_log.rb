@@ -5,4 +5,6 @@ class EventLog < ApplicationRecord
 
   belongs_to :user
   belongs_to :resourceable, polymorphic: true
+
+  serialize :variation, Hash
 end
