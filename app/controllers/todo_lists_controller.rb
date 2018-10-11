@@ -3,8 +3,10 @@
 class TodoListsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_todo_list, only: %i[show edit update destroy]
-  before_action :check_update_permission, only: [:update]
-  before_action :check_destroy_permission, only: [:destroy]
+  rescue_from Pundit::NotAuthorizedError do
+    flash[:alert] = 'You cannot perform this action'
+    redirect_to edit_todo_list_path(@todo_list)
+  end
 
   def index
     @todo_list = current_user.todo_lists.first
@@ -27,6 +29,8 @@ class TodoListsController < ApplicationController
   end
 
   def update
+    authorize @todo_list, :update?
+
     @todo_list.update!(todo_list_params)
 
     @log = EventLogger.log(
@@ -42,6 +46,8 @@ class TodoListsController < ApplicationController
   end
 
   def destroy
+    authorize @todo_list, :delete?
+
     @todo_list.destroy!
     @log = EventLogger.log(
       resource: @todo_list,
@@ -62,20 +68,5 @@ class TodoListsController < ApplicationController
 
   def set_todo_list
     @todo_list = current_user.todo_lists.find(params[:id])
-  end
-
-  def check_update_permission
-    current_user_role = current_user.role_of(@todo_list)
-    unless current_user_role.owner? || current_user_role.admin?
-      flash[:alert] = 'You cannot update this todo list.'
-      return redirect_to edit_todo_list_path(@todo_list)
-    end
-  end
-
-  def check_destroy_permission
-    unless current_user.role_of(@todo_list).owner?
-      flash[:alert] = 'You cannot delete this todo list.'
-      redirect_to edit_todo_list_path(@todo_list)
-    end
   end
 end
