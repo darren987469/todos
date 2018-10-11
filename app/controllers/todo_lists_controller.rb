@@ -23,9 +23,8 @@ class TodoListsController < ApplicationController
 
   def edit
     @todo_listship = @todo_list.todo_listships.new
-    @users = @todo_list.users
-                       .includes(:todo_listships)
-                       .where(todo_listships: { todo_list_id: @todo_list.id })
+    @todo_listships = TodoListship.includes(:user)
+                                  .where(todo_list_id: @todo_list.id)
   end
 
   def update

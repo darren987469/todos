@@ -22,7 +22,7 @@
                 <input type="submit" class="btn btn-sm btn-primary" value="Rename"/>
               </div>
             <% end %>
-            <hr></hr>
+            <hr>
 
             <h4> Members </h4>
             <p> Roles are owner, admin, user. Owner can delete list. Admin can invite/delete member.</p>
@@ -46,10 +46,8 @@
                 </tr>
               </thead>
               <tbody>
-                <%
-                  @users.each do |user|
-                    todo_listship = user.todo_listships.find { |todo_listship| todo_listship.todo_list_id == @todo_list.id }
-                %>
+                <% @todo_listships.each do |todo_listship| %>
+                  <% user = todo_listship.user %>
                   <tr>
                     <td><%= user.name %></td>
                     <td><%= user.email %></td>
@@ -67,10 +65,13 @@
                 <% end %>
               </tbody>
             </table>
-            <hr></hr>
+            <hr>
 
             <h4 class="text-danger">Danger Zone</h4>
-            <p><strong>Delete this list.</strong> Todos in this list will also be deleted. Once you delete this list, there is no going back. Please be certain.</p>
+            <p>
+              <strong>Delete this list.</strong>
+              Todos in this list will also be deleted. Once you delete this list, there is no going back. Please be certain.
+            </p>
             <%= button_to 'Delete', todo_list_path(@todo_list), method: :delete, class: 'btn btn-danger btn-sm' %>
           </div>
         </div>
