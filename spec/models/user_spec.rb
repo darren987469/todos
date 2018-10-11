@@ -30,5 +30,11 @@ describe User, type: :model do
         expect(user.role_of(todo_list)).to eq role
       end
     end
+
+    context 'todo_list not belongs_to user' do
+      it 'returns nil' do
+        expect(user.role_of(todo_list)).to be_nil
+      end
+    end
   end
 end
