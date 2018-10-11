@@ -43,6 +43,7 @@ gem 'kaminari'
 gem 'momentjs-rails'
 gem 'react-rails'
 gem 'rubocop', require: false
+gem 'pundit'
 
 # test coverage
 gem 'coveralls', require: false

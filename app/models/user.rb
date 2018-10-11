@@ -15,6 +15,6 @@ class User < ApplicationRecord
   alias name full_name
 
   def role_of(todo_list)
-    todo_listships.where(todo_list_id: todo_list.to_param).first.role.inquiry
+    todo_listships.where(todo_list_id: todo_list.to_param).first&.role&.inquiry
   end
 end

@@ -1,33 +1,41 @@
 # frozen_string_literal: true
 
 class TodoListshipsController < ApplicationController
-  before_action :set_todo_list
-  before_action :set_todo_listship, only: [:destroy]
-  before_action :check_create_permission, only: [:create]
-  before_action :check_destroy_permission, only: [:destroy]
-
   def create
-    @member = User.find_by_email(params[:email])
-    if @member.blank?
-      flash[:alert] = 'No user.'
-      return redirect_to edit_todo_list_path(@todo_list)
-    end
+    authorize todo_list, :invite_member?
+
+    member = User.find_by!(email: params[:email])
 
     ActiveRecord::Base.transaction do
-      @todo_list.todo_listships.create!(user: @member, role: :user)
-      @log = ::EventLogger.log(
-        resource: @todo_list,
+      todo_list.todo_listships.create!(user: member, role: :user)
+      log = ::EventLogger.log(
+        resource: todo_list,
         user: current_user,
         action: 'create',
-        description: "#{current_user.name} add a member #{@member.name} to todo list.",
-        tag: @todo_list.log_tag
+        description: "#{current_user.name} add a member #{member.name} to todo list.",
+        tag: todo_list.log_tag
       )
     end
-
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = 'You cannot add member.'
+  rescue ActiveRecord::RecordNotFound
+    flash[:alert] = 'No user.'
+  ensure
     redirect_to edit_todo_list_path(@todo_list)
   end
 
   def destroy
+    if todo_listship.user_id == current_user.id
+      flash[:alert] = 'You cannot delete yourself.'
+      return redirect_to edit_todo_list_path(todo_list)
+    end
+
+    current_user_role = current_user.role_of(todo_list)
+    unless permission_of(current_user_role) > permission_of(todo_listship.role)
+      flash[:alert] = 'You cannot delete this member.'
+      return redirect_to edit_todo_list_path(@todo_list)
+    end
+
     ActionCable.server.broadcast(@todo_list.log_tag,
                                  action: 'delete_member',
                                  member: { id: @todo_listship.user_id },
@@ -43,32 +51,11 @@ class TodoListshipsController < ApplicationController
     TodoListship.roles[role]
   end
 
-  def set_todo_list
-    @todo_list = current_user.todo_lists.find(params[:todo_list_id])
+  def todo_list
+    @todo_list ||= current_user.todo_lists.find(params[:todo_list_id])
   end
 
-  def set_todo_listship
-    @todo_listship = @todo_list.todo_listships.find(params[:id])
-  end
-
-  def check_create_permission
-    current_user_role = current_user.role_of(@todo_list)
-    unless current_user_role.admin? || current_user_role.owner?
-      flash[:alert] = 'You cannot add member.'
-      return redirect_to edit_todo_list_path(@todo_list)
-    end
-  end
-
-  def check_destroy_permission
-    if @todo_listship.user_id == current_user.id
-      flash[:alert] = 'You cannot delete yourself.'
-      return redirect_to edit_todo_list_path(@todo_list)
-    end
-
-    current_user_role = current_user.role_of(@todo_list)
-    unless permission_of(current_user_role) > permission_of(@todo_listship.role)
-      flash[:alert] = 'You cannot delete this member.'
-      return redirect_to edit_todo_list_path(@todo_list)
-    end
+  def todo_listship
+    @todo_listship ||= todo_list.todo_listships.find(params[:id])
   end
 end

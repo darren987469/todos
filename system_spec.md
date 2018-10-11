@@ -54,7 +54,7 @@ Role | user | admin | owner
 -------------- | ------|-------|-----
 read TodoList  | ️️V | V | V
 create TodoList| V | V | V
-update TodoList| V | V | V
+update TodoList| X | V | V
 invite member to TodoList| X | V | V
 delete TodoList| X | X | V
 
