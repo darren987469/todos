@@ -6,5 +6,5 @@ class TodoListship < ApplicationRecord
 
   scope :owner, -> { where(role: :owner) }
 
-  enum role: { owner: 2000, admin: 1000, user: 0 }
+  enum role: { owner: 2000, admin: 1000, user: 0 }, _prefix: true
 end
