@@ -43,7 +43,7 @@ describe TodoListsController, type: :request do
       it 'renders correctly after redirect' do
         subject
         follow_redirect!
-        expect(response.body).to include 'No user.'
+        expect(response.body).to include 'No such user.'
       end
     end
 
@@ -56,16 +56,17 @@ describe TodoListsController, type: :request do
         expect(todo_listship.role).to eq 'user'
       end
 
-      it 'create log' do
-        expect(::EventLogger).to receive(:log).with(
-          resource: todo_list,
-          user: user,
-          action: 'create',
-          description: "#{user.name} add a member #{member.name} to todo list.",
-          tag: "todo_list_#{todo_list.id}"
-        )
+      it 'calls TodoListChannel::TodoListshipOperations' do
+        expect_any_instance_of(TodoListChannel::TodoListshipOperations).to receive(:create)
         subject
       end
+
+      it 'broadcasts changes' do
+        expect(ActionCable.server).to receive(:broadcast)
+        subject
+      end
+
+      it { expect { subject }.to change { EventLog.count }.by(1) }
       it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
     end
   end
