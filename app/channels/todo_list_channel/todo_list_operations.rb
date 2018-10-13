@@ -21,6 +21,15 @@ class TodoListChannel
       broadcast(todo_list, log)
     end
 
+    def destroy(todo_list)
+      authorize todo_list, :delete?
+
+      todo_list.destroy!
+
+      log = create_log!(todo_list)
+      broadcast(todo_list, log)
+    end
+
     private
 
     def todo_list_params

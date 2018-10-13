@@ -36,15 +36,8 @@ class TodoListsController < ApplicationController
   end
 
   def destroy
-    authorize @todo_list, :delete?
-
-    @todo_list.destroy!
-    @log = EventLogger.log(
-      resource: @todo_list,
-      user: current_user,
-      action: :destroy
-    )
-    ActionCable.server.broadcast(@todo_list.log_tag, action: 'destroy_todo_list')
+    params[:method] = 'destroy_todo_list'
+    TodoListChannel::TodoListOperations.new(stream_token, current_user, params).destroy(@todo_list)
 
     flash[:notice] = "List #{@todo_list.name} is deleted!"
     redirect_to todo_lists_path

@@ -111,9 +111,11 @@ describe TodoListsController, type: :request do
     let(:todo_list) { @todo_list }
     subject { delete "/todo_lists/#{@todo_list.id}" }
 
-    context 'when user are not owner or admin of todo list' do
+    context 'when user is not owner of todo list' do
       before { @todo_list = create_todo_list(role: :user) }
+
       it { expect(subject).to redirect_to edit_todo_list_path(@todo_list) }
+      it { expect { subject }.not_to change { TodoList.count } }
     end
 
     context 'when user has permission(owner) to delete' do
@@ -122,17 +124,21 @@ describe TodoListsController, type: :request do
         create_todo_list(role: :owner) # create two redirect_to index then show
       end
 
-      it { expect { subject }.to change { TodoList.count }.by(-1) }
-      it { expect { subject }.to change { EventLog.count }.by(1) }
-      it do
-        expect(ActionCable.server).to receive(:broadcast).with(
-          todo_list.log_tag,
-          action: 'destroy_todo_list'
-        )
+      it 'calls TodoListChannel::TodoListOperations' do
+        expect(TodoListChannel::TodoListOperations).to receive_message_chain(:new, :destroy)
         subject
       end
+
+      it 'broadcast changes' do
+        expect(ActionCable.server).to receive(:broadcast)
+        subject
+      end
+
+      it { expect { subject }.to change { TodoList.count }.by(-1) }
+      it { expect { subject }.to change { EventLog.count }.by(1) }
       it { expect(subject).to redirect_to todo_lists_path }
-      it do
+
+      it 'renders correctly' do
         subject
         follow_redirect!
         follow_redirect!

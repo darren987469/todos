@@ -117,4 +117,52 @@ describe TodoListChannel::TodoListOperations do
       subject
     end
   end
+
+  describe '#destroy(todo_list)' do
+    let(:todo_list) { create(:todo_list) }
+    let!(:todo_listship) { create(:todo_listship, user: user, todo_list: todo_list, role: :owner) }
+    let(:params) { ActionController::Parameters.new(method: 'destroy_todo_list') }
+
+    subject { described_class.new(stream_token, user, params).destroy(todo_list) }
+
+    context 'when user is not authorized to destroy todo_list' do
+      before { todo_listship.update(role: :user) }
+
+      it 'raise error and won\'t destroy todo_list' do
+        expect { subject }.to raise_error Pundit::NotAuthorizedError
+        expect(todo_list.reload).to be_present
+      end
+    end
+
+    it 'destroy todo_list' do
+      expect { subject }.to change { TodoList.count }.by(-1)
+    end
+
+    it 'creates log' do
+      expect { subject }.to change { EventLog.count }.by(1)
+
+      expect(EventLog.last).to have_attributes(
+        resourceable_type: 'TodoList',
+        resourceable_id: todo_list.id,
+        user: user,
+        action: 'destroy',
+        log_tag: todo_list.log_tag,
+        description: %(#{user.name} destroy a todo_list)
+      )
+    end
+
+    it 'broadcasts todo_list and log' do
+      log_double = double('log')
+      allow(EventLogger).to receive(:log) { log_double }
+
+      expect(ActionCable.server).to receive(:broadcast).with(
+        stream_token,
+        action: 'destroy_todo_list',
+        todo_list: todo_list,
+        log: log_double,
+        errors: nil
+      )
+      subject
+    end
+  end
 end
