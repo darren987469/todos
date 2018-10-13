@@ -2,6 +2,8 @@
 
 class TodoListChannel
   class BaseOperations
+    include Pundit
+
     attr_reader :stream_token, :current_user, :params, :channel_action, :action_name
 
     def initialize(stream_token, current_user, params)

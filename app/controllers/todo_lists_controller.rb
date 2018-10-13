@@ -28,32 +28,16 @@ class TodoListsController < ApplicationController
   end
 
   def update
-    authorize @todo_list, :update?
-
-    @todo_list.update!(todo_list_params)
-
-    @log = EventLogger.log(
-      resource: @todo_list,
-      user: current_user,
-      action: :update,
-      changes: @todo_list.previous_changes.except(:updated_at)
-    )
-    ActionCable.server.broadcast(@todo_list.log_tag, action: 'update_todo_list')
+    params[:method] = 'update_todo_list'
+    TodoListChannel::TodoListOperations.new(stream_token, current_user, params).update(@todo_list)
 
     flash[:notice] = 'Name is updated!'
     redirect_to edit_todo_list_path(@todo_list)
   end
 
   def destroy
-    authorize @todo_list, :delete?
-
-    @todo_list.destroy!
-    @log = EventLogger.log(
-      resource: @todo_list,
-      user: current_user,
-      action: :destroy
-    )
-    ActionCable.server.broadcast(@todo_list.log_tag, action: 'destroy_todo_list')
+    params[:method] = 'destroy_todo_list'
+    TodoListChannel::TodoListOperations.new(stream_token, current_user, params).destroy(@todo_list)
 
     flash[:notice] = "List #{@todo_list.name} is deleted!"
     redirect_to todo_lists_path
@@ -61,11 +45,11 @@ class TodoListsController < ApplicationController
 
   private
 
-  def todo_list_params
-    params.require(:todo_list).permit(:name)
-  end
-
   def set_todo_list
     @todo_list = current_user.todo_lists.find(params[:id])
+  end
+
+  def stream_token
+    @todo_list.log_tag
   end
 end

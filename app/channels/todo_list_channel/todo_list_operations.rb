@@ -12,14 +12,37 @@ class TodoListChannel
       end
     end
 
+    def update(todo_list)
+      authorize todo_list, :update?
+
+      todo_list.update!(todo_list_params)
+
+      log = create_log!(todo_list, changes: todo_list.previous_changes.except(:updated_at))
+      broadcast(todo_list, log)
+    end
+
+    def destroy(todo_list)
+      authorize todo_list, :delete?
+
+      todo_list.destroy!
+
+      log = create_log!(todo_list)
+      broadcast(todo_list, log)
+    end
+
     private
 
-    def create_log!(todo_list)
+    def todo_list_params
+      params.require(:todo_list).permit(:name)
+    end
+
+    def create_log!(todo_list, changes: nil)
       ::EventLogger.log(
         resource: todo_list,
         user: current_user,
         action: action_name,
-        tag: todo_list.log_tag
+        tag: todo_list.log_tag,
+        changes: changes
       )
     end
 
