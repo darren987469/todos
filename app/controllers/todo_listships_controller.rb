@@ -25,14 +25,7 @@ class TodoListshipsController < ApplicationController
   end
 
   def destroy
-    authorize todo_listship, :delete?
-
-    ActionCable.server.broadcast(@todo_list.log_tag,
-                                 action: 'delete_member',
-                                 member: { id: @todo_listship.user_id },
-                                 todo_list: @todo_list)
-
-    @todo_listship.destroy
+    operation.destroy
   rescue Pundit::NotAuthorizedError
     flash[:alert] = 'You cannot perform this action.'
   ensure
@@ -47,5 +40,9 @@ class TodoListshipsController < ApplicationController
 
   def todo_listship
     @todo_listship ||= todo_list.todo_listships.find(params[:id])
+  end
+
+  def operation
+    TodoListChannel::TodoListshipOperations.new(current_user, params, todo_list)
   end
 end

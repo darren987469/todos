@@ -88,6 +88,11 @@ describe TodoListsController, type: :request do
         follow_redirect!
         expect(response.body).to include 'You cannot perform this action.'
       end
+
+      it 'won\'t destroy todo_listship' do
+        subject
+        expect(member_todo_listship.reload).to be_present
+      end
     end
 
     subject { delete "/todo_lists/#{todo_list.id}/todo_listships/#{member_todo_listship.id}" }
@@ -102,20 +107,27 @@ describe TodoListsController, type: :request do
         follow_redirect!
         expect(response.body).to include 'You cannot perform this action.'
       end
+
+      it 'won\'t destroy todo_listship' do
+        subject
+        expect(member_todo_listship.reload).to be_present
+      end
     end
 
     context 'when success' do
-      it { expect { subject }.to change { TodoListship.count }.by(-1) }
-      it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
-      it do
-        expect(ActionCable.server).to receive(:broadcast).with(
-          todo_list.log_tag,
-          action: 'delete_member',
-          member: { id: member_todo_listship.user_id },
-          todo_list: todo_list
-        )
+      it 'calls TodoListChannel::TodoListshipOperations' do
+        expect_any_instance_of(TodoListChannel::TodoListshipOperations).to receive(:destroy)
         subject
       end
+
+      it 'broadcasts changes' do
+        expect(ActionCable.server).to receive(:broadcast)
+        subject
+      end
+
+      it { expect { subject }.to change { TodoListship.count }.by(-1) }
+      it { expect { subject }.to change { EventLog.count }.by(1) }
+      it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
     end
   end
 end
