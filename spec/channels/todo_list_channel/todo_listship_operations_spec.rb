@@ -11,7 +11,8 @@ describe TodoListChannel::TodoListshipOperations do
   describe '#create' do
     let(:params) do
       ActionController::Parameters.new(
-        email: member.email
+        email: member.email,
+        role: 'admin'
       )
     end
 
@@ -34,7 +35,7 @@ describe TodoListChannel::TodoListshipOperations do
       expect(TodoListship.last).to have_attributes(
         user: member,
         todo_list: todo_list,
-        role: 'user'
+        role: 'admin'
       )
     end
 

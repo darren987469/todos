@@ -18,7 +18,7 @@ class TodoListChannel
       member = User.find_by(email: params[:email])
       raise UserNotFound unless member.present?
 
-      todo_listship = todo_list.todo_listships.create!(user: member, role: :user)
+      todo_listship = todo_list.todo_listships.create!(user: member, role: params[:role])
       log = ::EventLogger.log(
         resource: todo_listship,
         user: current_user,

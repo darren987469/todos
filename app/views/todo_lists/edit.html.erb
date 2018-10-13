@@ -28,6 +28,11 @@
             <p> Roles are owner, admin, user. Owner can delete list. Admin can invite/delete member.</p>
             <%= form_for @todo_listship, url: todo_list_todo_listships_path(@todo_list), method: :post do |f| %>
               <div class="input-group">
+                <span>Invite member as </span>
+                <%= select_tag('role', options_for_select(role_options), required: true) %>
+                <span> of the todo list</span>
+              </div>
+              <div class="input-group">
                 <input name="email" type="email" placeholder="Memer email..." class="form-control" required="true">
                 <span class="input-group-btn">
                   <button class="btn btn-sm btn-primary" type="submit">Add Member</button>
