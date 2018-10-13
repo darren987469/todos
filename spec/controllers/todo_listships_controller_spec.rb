@@ -86,7 +86,7 @@ describe TodoListsController, type: :request do
       it 'renders correctly after redirect' do
         subject
         follow_redirect!
-        expect(response.body).to include 'You cannot delete yourself.'
+        expect(response.body).to include 'You cannot perform this action.'
       end
     end
 
@@ -100,7 +100,7 @@ describe TodoListsController, type: :request do
       it 'renders correctly after redirect' do
         subject
         follow_redirect!
-        expect(response.body).to include 'You cannot delete this member.'
+        expect(response.body).to include 'You cannot perform this action.'
       end
     end
 
