@@ -34,6 +34,31 @@ class TodoListChannel
       )
     end
 
+    def update
+      todo_listship = todo_list.todo_listships.find(params[:id])
+      todo_listship.role = params[:role]
+      authorize todo_listship, :update?
+
+      todo_listship.save!
+
+      member = todo_listship.user
+      log = ::EventLogger.log(
+        resource: todo_listship,
+        user: current_user,
+        action: 'update',
+        description: "#{current_user.name} change member #{member.name} to #{params[:role]} of the todo list.",
+        tag: todo_list.log_tag,
+        changes: todo_listship.previous_changes.except(:updated_at)
+      )
+      ActionCable.server.broadcast(
+        todo_list.log_tag,
+        action: 'update_member',
+        member: member,
+        todo_listship: todo_listship,
+        log: log
+      )
+    end
+
     def destroy
       todo_listship = todo_list.todo_listships.find(params[:id])
       authorize todo_listship, :delete?
