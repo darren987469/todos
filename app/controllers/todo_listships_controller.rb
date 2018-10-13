@@ -11,6 +11,14 @@ class TodoListshipsController < ApplicationController
     redirect_to edit_todo_list_path(@todo_list)
   end
 
+  def update
+    operation.update
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = 'You cannot perform this action.'
+  ensure
+    redirect_to edit_todo_list_path(@todo_list)
+  end
+
   def destroy
     operation.destroy
   rescue Pundit::NotAuthorizedError
