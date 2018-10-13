@@ -1,4 +1,8 @@
 class TodoListshipPolicy < ApplicationPolicy
+  def update?
+    delete?
+  end
+
   def delete?
     return false unless user.id != todo_listship.user_id
 
