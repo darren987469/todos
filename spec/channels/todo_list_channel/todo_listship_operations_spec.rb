@@ -11,7 +11,8 @@ describe TodoListChannel::TodoListshipOperations do
   describe '#create' do
     let(:params) do
       ActionController::Parameters.new(
-        email: member.email
+        email: member.email,
+        role: 'admin'
       )
     end
 
@@ -34,7 +35,7 @@ describe TodoListChannel::TodoListshipOperations do
       expect(TodoListship.last).to have_attributes(
         user: member,
         todo_list: todo_list,
-        role: 'user'
+        role: 'admin'
       )
     end
 
@@ -57,6 +58,60 @@ describe TodoListChannel::TodoListshipOperations do
         todo_list.log_tag,
         action: 'add_member',
         member: member,
+        log: log_double
+      )
+      subject
+    end
+  end
+
+  describe '#update' do
+    let!(:member_todo_listship) do
+      create(:todo_listship, user: member, todo_list: todo_list, role: :user)
+    end
+    let(:params) do
+      ActionController::Parameters.new(
+        todo_list_id: todo_list.id,
+        id: member_todo_listship.id,
+        role: 'admin'
+      )
+    end
+
+    subject { described_class.new(user, params, todo_list).update }
+
+    context 'update the member to ths same role as the user' do
+      before { params[:role] = 'owner' }
+
+      it 'raise error and won\'t update todo_listship' do
+        expect { subject }.to raise_error Pundit::NotAuthorizedError
+        expect(member_todo_listship.reload.role).to eq 'user'
+      end
+    end
+
+    it 'updates todo_listship role' do
+      expect { subject }.to change { member_todo_listship.reload.role }.from('user').to('admin')
+    end
+
+    it 'creates log' do
+      expect { subject }.to change { EventLog.count }.by(1)
+      expect(EventLog.last).to have_attributes(
+        resourceable: member_todo_listship.reload,
+        user: user,
+        action: 'update',
+        description: %(#{user.name} change member #{member.name} to admin of the todo list.),
+        log_tag: todo_list.log_tag,
+        variation: { 'role' => ['user', 'admin'] }
+      )
+    end
+
+    it 'broadcasts changes' do
+      log_double = double('log')
+      allow(EventLogger).to receive(:log) { log_double }
+
+      expect(ActionCable.server).to receive(:broadcast).with(
+        todo_list.log_tag,
+        action: 'update_member',
+        member: member,
+        todo_listship: member_todo_listship,
         log: log_double
       )
       subject

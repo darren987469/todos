@@ -47,6 +47,8 @@ rails s        # start server in http://localhost:300
 
 Follow [git flow](http://nvie.com/posts/a-successful-git-branching-model/).
 
+UI is based on [ace admin](https://github.com/bopoda/ace), [Demo website](http://ace.jeka.by/)
+
 ## Testing
 
 ```shell

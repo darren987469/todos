@@ -11,6 +11,20 @@ class TodoListshipsController < ApplicationController
     redirect_to edit_todo_list_path(@todo_list)
   end
 
+  def edit
+    todo_list
+    @member = todo_listship.user
+  end
+
+  def update
+    operation.update
+    flash[:notice] = 'Role is updated!'
+  rescue Pundit::NotAuthorizedError
+    flash[:alert] = 'You cannot perform this action.'
+  ensure
+    redirect_to edit_todo_list_todo_listship_path(todo_list, todo_listship)
+  end
+
   def destroy
     operation.destroy
   rescue Pundit::NotAuthorizedError
