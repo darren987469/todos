@@ -86,9 +86,10 @@ describe TodoListsController, type: :request do
     end
 
     context 'NotAuthorizedError' do
-      before { allow_any_instance_of(TodoListChannel::TodoListshipOperations).to receive(:update) { raise Pundit::NotAuthorizedError } }
+      let(:operation_class) { TodoListChannel::TodoListshipOperations }
+      before { allow_any_instance_of(operation_class).to receive(:update) { raise Pundit::NotAuthorizedError } }
 
-      it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
+      it { expect(subject).to redirect_to edit_todo_list_todo_listship_path(todo_list, member_todo_listship) }
 
       it 'renders correctly after redirect' do
         subject
@@ -107,7 +108,7 @@ describe TodoListsController, type: :request do
     end
 
     it { expect { subject }.to change { EventLog.count }.by(1) }
-    it { expect(subject).to redirect_to edit_todo_list_path(todo_list) }
+    it { expect(subject).to redirect_to edit_todo_list_todo_listship_path(todo_list, member_todo_listship) }
   end
 
   describe 'DELETE /todo_lists/:todo_list_id/todo_listships/:id' do

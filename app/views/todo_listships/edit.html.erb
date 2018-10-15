@@ -1,0 +1,29 @@
+<div class="container-fluid" style="font-size: 15px;">
+  <div class="row">
+    <div class="col-sm-6">
+      <div class="widget-box transparent" style="opacity: 1;">
+        <div class="widget-header">
+          <h2 class="widget-title lighter">
+            <%= @member.name %>
+            <small>
+              <i class="ace-icon fa fa-angle-double-right"></i>
+              <%= link_to 'Back to todo list settings', edit_todo_list_path(@todo_list) %>
+            </small>
+          </h2>
+        </div>
+
+        <div class="widget-body">
+          <div class="widget-main padding-6">
+            <%= form_for @todo_listship, url: todo_list_todo_listship_path(@todo_list, @todo_listship) do |f| %>
+              email: <%= @member.email %><br>
+              <div class="form-group">
+                role:
+                <%= select_tag('role', options_for_select(role_options, @todo_listship.role), required: true) %>
+              </div>
+              <%= f.submit 'Save', class: 'btn btn-sm btn-primary' %>
+            <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

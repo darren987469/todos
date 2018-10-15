@@ -10,6 +10,6 @@ Rails.application.routes.draw do
   }
 
   resources :todo_lists do
-    resources :todo_listships, only: %i[create update destroy]
+    resources :todo_listships, only: %i[create edit update destroy]
   end
 end
