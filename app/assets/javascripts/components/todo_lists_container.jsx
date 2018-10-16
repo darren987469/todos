@@ -94,11 +94,12 @@ class TodoListsContainer extends React.Component {
               </a>
             </div>
           )
+          return
         }
-        return
     }
     this.setState(prevState => {
-      var nextTodos
+      var nextTodos = prevState.todos
+      var message
       switch(data.action){
         case 'create_todo':
           nextTodos = prevState.todos.concat(data.todo)
@@ -113,6 +114,12 @@ class TodoListsContainer extends React.Component {
         case 'destroy_todo':
           nextTodos = prevState.todos.filter(todo => todo.id !== data.todo.id)
           break
+        case 'add_member':
+          message = { type: 'info', content: `${data.member.first_name} ${data.member.last_name} is invited to this todo list.` }
+          break
+        case 'delete_member':
+          message = { type: 'info', content: `${data.member.first_name} ${data.member.last_name} is removed from this todo list.` }
+          break
         default:
           console.error('unknown action')
           return
@@ -124,7 +131,7 @@ class TodoListsContainer extends React.Component {
         nextLogs = this.nextLogsState(data.log)
       }
 
-      return({ todos: nextTodos, logs: nextLogs })
+      return(Object.assign({ todos: nextTodos, logs: nextLogs }, { message: message }))
     })
   }
 
