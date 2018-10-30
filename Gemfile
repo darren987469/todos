@@ -37,7 +37,10 @@ gem 'awesome_rails_console'
 gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'devise'
-
+gem 'grape'
+gem 'grape-entity'
+gem 'grape-swagger'
+gem 'grape-swagger-rails'
 gem 'jquery-rails'
 gem 'kaminari'
 gem 'momentjs-rails'
