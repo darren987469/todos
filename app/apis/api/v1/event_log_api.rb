@@ -1,6 +1,9 @@
 module API
   module V1
     class EventLogAPI < Grape::API
+      content_type :json, 'application/json'
+      content_type :csv,  'application/csv'
+
       desc(
         'Get logs of TodoList',
         tags: ['logs'],
