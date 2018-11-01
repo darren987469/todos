@@ -21,6 +21,7 @@ module API
 
         todo_list = current_user.todo_lists.find(params[:todo_lis_id])
         event_logs = EventLog.where(log_tag: todo_list.log_tag)
+        error!('No data.', 204) unless event_logs.present?
 
         present event_logs, with: Entity::V1::EventLog
       end
