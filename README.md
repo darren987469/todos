@@ -14,6 +14,11 @@ Detail spec can be found in [System Spec](system_spec.md)
 ## Screen shot
 ![Todo screenshot](/screenshots/Screen_Shot_2018-05-15.png?raw=true)
 
+## API document
+
+Production:  https://todos-actioncable.herokuapp.com/swagger
+Development: http://localhost:3000/swagger
+
 ## Potential bottleneck and todos
 
 The bottleneck of this app maybe rails action cable. It has poor performance when handle a large number of client.
