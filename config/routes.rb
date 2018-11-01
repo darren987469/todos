@@ -2,6 +2,8 @@
 
 Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
+  mount API::BaseAPI => '/api'
+  mount GrapeSwaggerRails::Engine => '/swagger'
 
   root to: 'todo_lists#index'
 
