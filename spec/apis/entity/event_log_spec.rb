@@ -7,7 +7,16 @@ describe Entity::V1::EventLog do
       create(:todo_listship, user: user, todo_list: todo_list, role: :owner)
     end
   end
-  let(:event_log) { create(:log, resourceable: todo_list, user: user, action: 'create', description: 'description', log_tag: todo_list.log_tag) }
+  let(:event_log) do
+    create(
+      :log,
+      resourceable: todo_list,
+      user: user,
+      action: 'create',
+      description: 'description',
+      log_tag: todo_list.log_tag
+    )
+  end
 
   subject { described_class.new(event_log).as_json }
 

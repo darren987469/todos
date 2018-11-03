@@ -8,10 +8,13 @@ AllCops:
     - '.pryrc'
 
 Metrics/LineLength:
-  Max: 100
+  Max: 120
 
 Metrics/BlockLength:
   Enabled: false
 
 Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
   Enabled: false

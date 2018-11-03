@@ -11,8 +11,8 @@ module Formatter
           headers = objects.first.as_json.keys
           csv << headers
 
-          objects.each do |object|
-            csv << object.as_json.values
+          objects.each do |obj|
+            csv << obj.as_json.values
           end
         end
       end

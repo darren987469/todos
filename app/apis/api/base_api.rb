@@ -18,7 +18,7 @@ module API
     end
 
     if Rails.env.production? || Rails.env.staging?
-      rescue_from :all do |error|
+      rescue_from :all do |_error|
         error!('Internal Server Error.', 500)
       end
     end
