@@ -4,6 +4,8 @@ module API
       content_type :json, 'application/json'
       content_type :csv,  'application/csv'
 
+      before { authenticate_user! }
+
       desc(
         'Get logs of TodoList',
         tags: ['logs'],
