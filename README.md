@@ -43,10 +43,14 @@ brew install elasticsearch
 ## Install
 
 ```shell
-bundle         # install gems
-rails db:setup # create db and seed
-rails s        # start server in http://localhost:300
+bundle                # install gems
+overcommit --install  # add git hook tool
+overcommit --sign     # apply git hook. execute it after changing .overcommit.yml
+rails db:setup        # create db and seed
+rails s               # start server in http://localhost:300
 ```
+
+Ignore git hook: `SKIP=RuboCop git commit`
 
 ## Development
 

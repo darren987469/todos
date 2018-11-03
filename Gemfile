@@ -3,10 +3,10 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.1'
+ruby '2.5.3'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.0'
+gem 'rails', '~> 5.2.1'
 # Use postgresql as the database for Active Record
 gem 'pg', '>= 0.18', '< 2.0'
 gem 'redis'
@@ -45,9 +45,9 @@ gem 'grape-swagger-rails'
 gem 'jquery-rails'
 gem 'kaminari'
 gem 'momentjs-rails'
+gem 'pundit'
 gem 'react-rails'
 gem 'rubocop', require: false
-gem 'pundit'
 
 # test coverage
 gem 'coveralls', require: false
@@ -63,6 +63,7 @@ group :development do
   gem 'listen', '>= 3.0.5', '< 3.2'
   gem 'web-console', '>= 3.3.0'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'overcommit'
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 end

@@ -99,7 +99,7 @@ describe TodoListChannel::TodoListshipOperations do
         action: 'update',
         description: %(#{user.name} change member #{member.name} to admin of the todo list.),
         log_tag: todo_list.log_tag,
-        variation: { 'role' => ['user', 'admin'] }
+        variation: { 'role' => %w[user admin] }
       )
     end
 

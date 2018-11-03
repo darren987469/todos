@@ -12,7 +12,7 @@ describe API::V1::EventLogAPI, type: :request do
     let(:params) do
       {
         start_date: Date.today,
-        end_date:   Date.today
+        end_date: Date.today
       }
     end
 
@@ -38,7 +38,16 @@ describe API::V1::EventLogAPI, type: :request do
     end
 
     context 'event log exists' do
-      let!(:event_log) { create(:log, resourceable: todo_list, user: user, log_tag: todo_list.log_tag, action: 'create', description: 'description' ) }
+      let!(:event_log) do
+        create(
+          :log,
+          resourceable: todo_list,
+          user: user,
+          log_tag: todo_list.log_tag,
+          action: 'create',
+          description: 'description'
+        )
+      end
 
       it 'returns success and event logs' do
         subject
