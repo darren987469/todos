@@ -1,0 +1,2 @@
+class UnauthenticateError < StandardError
+end
