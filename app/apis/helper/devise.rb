@@ -8,7 +8,7 @@ module Helper
       warden.set_user(user)
     end
 
-    def current_user
+    def devise_user
       warden.user
     end
   end
