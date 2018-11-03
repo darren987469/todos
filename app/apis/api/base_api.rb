@@ -3,10 +3,14 @@ module API
     default_format :json
     formatter :csv, Formatter::V1::CSV
 
-    helpers Helper::Devise
+    helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
 
     rescue_from Grape::Exceptions::ValidationErrors do |error|
       error!(error.message, 400)
+    end
+
+    rescue_from UnauthenticateError do |_error|
+      error!('Unauthorized.', 401)
     end
 
     rescue_from Pundit::NotAuthorizedError do |_error|
