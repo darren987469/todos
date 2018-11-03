@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   has_many :todo_listships, class_name: '::TodoListship'
   has_many :todo_lists, through: :todo_listships, class_name: '::TodoList'
+  has_many :tokens
 
   def full_name
     "#{first_name} #{last_name}"
