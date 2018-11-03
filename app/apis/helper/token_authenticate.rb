@@ -7,7 +7,7 @@ module Helper
     end
 
     def token_authenticate!
-      access_token || (raise UnauthenticateError)
+      access_token || (raise NotAuthenticatedError)
     end
 
     def access_token

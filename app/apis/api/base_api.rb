@@ -9,7 +9,7 @@ module API
       error!(error.message, 400)
     end
 
-    rescue_from UnauthenticateError do |_error|
+    rescue_from NotAuthenticatedError do |_error|
       error!('Unauthorized.', 401)
     end
 

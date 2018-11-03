@@ -24,7 +24,7 @@ describe Helper::TokenAuthenticate do
     context 'when invalid token' do
       let(:headers) { { 'Authorization' => 'token invalid_token' } }
 
-      it { expect { subject }.to raise_error UnauthenticateError }
+      it { expect { subject }.to raise_error NotAuthenticatedError }
     end
 
     context 'valid token' do
