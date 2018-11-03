@@ -1,5 +1,12 @@
 class Token < ApplicationRecord
+  SCOPE_OPTIONS = %w[read:log write:log].freeze
+
   belongs_to :user
 
-  serialize :scopes
+  def payload
+    {
+      id: id,
+      scopes: scopes
+    }
+  end
 end
