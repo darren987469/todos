@@ -14,4 +14,7 @@ Rails.application.routes.draw do
   resources :todo_lists do
     resources :todo_listships, only: %i[create edit update destroy]
   end
+  namespace :settings do
+    root to: 'settings#index'
+  end
 end
