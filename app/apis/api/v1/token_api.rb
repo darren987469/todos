@@ -4,6 +4,24 @@ module API
       format :json
 
       resource 'tokens' do
+        desc 'Get tokens' do
+          success Entity::V1::Token
+        end
+        get do
+          tokens = current_user.tokens
+
+          present tokens, with: Entity::V1::Token
+        end
+
+        desc 'Get token' do
+          success Entity::V1::Token
+        end
+        get ':id' do
+          token = current_user.tokens.find(params[:id])
+
+          present token, with: Entity::V1::Token
+        end
+
         desc 'Create token' do
           success Entity::V1::EncodedToken
         end

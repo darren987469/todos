@@ -3,6 +3,38 @@ require 'rails_helper'
 describe API::V1::TokenAPI, type: :request do
   let(:user) { create(:user1) }
 
+  describe 'GET /api/v1/tokens' do
+    let!(:token) { create(:token, user: user, note: 'note', scopes: ['read:log']) }
+    let(:endpoint) { '/api/v1/tokens' }
+
+    subject { get endpoint }
+
+    before { sign_in user }
+
+    it 'returns success and tokens' do
+      subject
+      expect(response).to have_http_status :success
+      expected_body = Entity::V1::Token.represent([token]).to_json
+      expect(response.body).to eq expected_body
+    end
+  end
+
+  describe 'GET /api/v1/tokens' do
+    let!(:token) { create(:token, user: user, note: 'note', scopes: ['read:log']) }
+    let(:endpoint) { "/api/v1/tokens/#{token.id}" }
+
+    subject { get endpoint }
+
+    before { sign_in user }
+
+    it 'returns success and tokens' do
+      subject
+      expect(response).to have_http_status :success
+      expected_body = Entity::V1::Token.represent(token).to_json
+      expect(response.body).to eq expected_body
+    end
+  end
+
   describe 'POST /api/v1/tokens' do
     let(:endpoint) { '/api/v1/tokens' }
     let(:params) do
