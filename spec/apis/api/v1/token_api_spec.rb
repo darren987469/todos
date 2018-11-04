@@ -46,8 +46,8 @@ describe API::V1::TokenAPI, type: :request do
     end
   end
 
-  describe 'PATCH /api/v1/tokens' do
-    let(:token) { create(:token, user: user, note: 'note', scopes: ['read:log']) }
+  describe 'PATCH /api/v1/tokens/:token_id' do
+    let!(:token) { create(:token, user: user, note: 'note', scopes: ['read:log']) }
     let(:endpoint) { "/api/v1/tokens/#{token.id}" }
     let(:params) do
       {
@@ -90,6 +90,23 @@ describe API::V1::TokenAPI, type: :request do
         note: params[:note],
         scopes: params[:scopes]
       )
+    end
+  end
+
+  describe 'DELETE /api/v1/tokens/:token_id' do
+    let!(:token) { create(:token, user: user, note: 'note', scopes: ['read:log']) }
+    let(:endpoint) { "/api/v1/tokens/#{token.id}" }
+
+    subject { delete endpoint }
+
+    before { sign_in user }
+
+    it 'deletes token and returns success' do
+      expect { subject }.to change { Token.count }.by(-1)
+
+      expect(response).to have_http_status :success
+      expected_body = Entity::V1::Token.represent(token).to_json
+      expect(response.body).to eq expected_body
     end
   end
 end

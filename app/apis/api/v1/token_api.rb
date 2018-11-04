@@ -36,6 +36,16 @@ module API
 
           present token, with: Entity::V1::Token
         end
+
+        desc 'Delete token' do
+          success Entity::V1::Token
+        end
+        delete ':id' do
+          token = current_user.tokens.find(params[:id])
+          token.destroy
+
+          present token, with: Entity::V1::Token
+        end
       end
     end
   end
