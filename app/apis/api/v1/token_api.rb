@@ -4,27 +4,34 @@ module API
       format :json
 
       resource 'tokens' do
-        desc 'Get tokens' do
-          success Entity::V1::Token
-        end
+        desc(
+          'Get tokens',
+          tags: ['tokens'],
+          success: Entity::V1::Token,
+          is_array: true
+        )
         get do
           tokens = current_user.tokens
 
           present tokens, with: Entity::V1::Token
         end
 
-        desc 'Get token' do
-          success Entity::V1::Token
-        end
+        desc(
+          'Get token',
+          tags: ['tokens'],
+          success: Entity::V1::Token
+        )
         get ':id' do
           token = current_user.tokens.find(params[:id])
 
           present token, with: Entity::V1::Token
         end
 
-        desc 'Create token' do
-          success Entity::V1::EncodedToken
-        end
+        desc(
+          'Create token',
+          tags: ['tokens'],
+          success: Entity::V1::EncodedToken
+        )
         params do
           requires :note, Entity::V1::Token.documentation[:note]
           requires :scopes, Entity::V1::Token.documentation[:scopes]
@@ -37,9 +44,11 @@ module API
           present token, with: Entity::V1::EncodedToken
         end
 
-        desc 'Update token' do
-          success Entity::V1::Token
-        end
+        desc(
+          'Update token',
+          tags: ['tokens'],
+          success: Entity::V1::Token
+        )
         params do
           optional :note, Entity::V1::Token.documentation[:note]
           optional :scopes, Entity::V1::Token.documentation[:scopes]
@@ -55,9 +64,11 @@ module API
           present token, with: Entity::V1::Token
         end
 
-        desc 'Delete token' do
-          success Entity::V1::Token
-        end
+        desc(
+          'Delete token',
+          tags: ['tokens'],
+          success: Entity::V1::EncodedToken
+        )
         delete ':id' do
           token = current_user.tokens.find(params[:id])
           token.destroy
