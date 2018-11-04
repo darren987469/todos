@@ -18,6 +18,24 @@ module API
 
           present token, with: Entity::V1::EncodedToken
         end
+
+        desc 'Update token' do
+          success Entity::V1::Token
+        end
+        params do
+          optional :note, Entity::V1::Token.documentation[:note]
+          optional :scopes, Entity::V1::Token.documentation[:scopes]
+        end
+        patch ':id' do
+          token = current_user.tokens.find(params[:id])
+
+          attributes = declared(params)
+          attributes[:scopes] = attributes[:scopes].uniq
+          token.assign_attributes(attributes)
+          token.save if token.changed?
+
+          present token, with: Entity::V1::Token
+        end
       end
     end
   end
