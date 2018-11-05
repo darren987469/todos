@@ -30,14 +30,6 @@ ActiveRecord::Schema.define(version: 2018_11_03_132419) do
     t.index ["user_id"], name: "index_event_logs_on_user_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
-    t.bigint "log_id"
-    t.bigint "user_id"
-    t.datetime "read_at"
-    t.index ["log_id"], name: "index_notifications_on_log_id"
-    t.index ["user_id"], name: "index_notifications_on_user_id"
-  end
-
   create_table "todo_lists", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
