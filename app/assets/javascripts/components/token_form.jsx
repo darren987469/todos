@@ -80,3 +80,7 @@ class TokenForm extends React.Component {
     )
   }
 }
+
+TokenForm.propTypes = {
+  createTokenRequest: PropTypes.func.isRequired
+}
