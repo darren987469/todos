@@ -2,11 +2,19 @@ class TokensContainer extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      tokens: props.tokens
+      tokens: props.tokens,
+      message: null
     }
     this.request = this.request.bind(this)
     this.createTokenRequest = this.createTokenRequest.bind(this)
     this.deleteTokenRequest = this.deleteTokenRequest.bind(this)
+  }
+
+  newTokenMessage() {
+    return({
+      type: 'info',
+      content: 'Make sure to copy your new personal access token now. You won’t be able to see it again!'
+    })
   }
 
   createTokenRequest(params) {
@@ -15,7 +23,10 @@ class TokensContainer extends React.Component {
       method: 'POST',
       success: (res) => {
         this.setState(prevState => {
-          return({ tokens: prevState.tokens.concat(res) })
+          return({
+            tokens: prevState.tokens.concat(res),
+            message: this.newTokenMessage()
+          })
         })
       }
     })
@@ -44,7 +55,7 @@ class TokensContainer extends React.Component {
 
   render() {
     const { createTokenRequest, deleteTokenRequest } = this
-    const { tokens } = this.state
+    const { tokens, message } = this.state
     return(
       <div className="main-container">
         <div className="main-content">
@@ -65,6 +76,7 @@ class TokensContainer extends React.Component {
                   <TokenList
                     tokens={ tokens }
                     deleteTokenRequest={ deleteTokenRequest } />
+                  { message && <MessageBlock message={ message } onDismiss={() => this.setState({ message: null })}/> }
                   <div className="space-8"/>
                   <TokenForm createTokenRequest={ createTokenRequest }/>
                 </div>

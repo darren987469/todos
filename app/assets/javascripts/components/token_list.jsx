@@ -16,16 +16,7 @@ function TokenList(props) {
   )
 }
 
-function TokenItem(props) {
-  const { token } = props
-  return(
-    <div className="dd-handle">
-      <a href="">{ token.note }</a> - { token.scopes.join(', ') }
-      <div className="pull-right action-buttons">
-        <a className="red" onClick={ ()=>{ props.deleteTokenRequest(token.id) } }>
-          <i className="ace-icon fa fa-trash-o bigger-130"></i>
-        </a>
-      </div>
-    </div>
-  )
+TokenList.propTypes = {
+  deleteTokenRequest: PropTypes.func.isRequired,
+  tokens: PropTypes.array
 }
