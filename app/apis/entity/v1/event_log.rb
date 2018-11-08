@@ -1,6 +1,7 @@
 module Entity
   module V1
     class EventLog < Grape::Entity
+      expose :id, documentation: { type: Integer }
       expose :todo_list_id, documentation: { type: Integer }
       expose :resource, documentation: {
         type: String,

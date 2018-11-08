@@ -1,6 +1,8 @@
 module API
   module V1
     class EventLogAPI < Grape::API
+      helpers Helper::SharedParams
+
       before { authenticate_user! }
 
       desc(
@@ -10,8 +12,7 @@ module API
         is_array: true
       )
       params do
-        requires :start_date, type: Date, default: Date.today
-        requires :end_date, type: Date, default: Date.today
+        use :period, :pagination
       end
       get 'todo_list/:todo_lis_id/logs' do
         start_date = params[:start_date].beginning_of_day
