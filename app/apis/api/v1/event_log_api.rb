@@ -1,9 +1,6 @@
 module API
   module V1
     class EventLogAPI < Grape::API
-      content_type :json, 'application/json'
-      content_type :csv,  'application/csv'
-
       before { authenticate_user! }
 
       desc(

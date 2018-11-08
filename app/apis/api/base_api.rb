@@ -1,6 +1,6 @@
 module API
   class BaseAPI < Grape::API
-    default_format :json
+    format :json
     formatter :csv, Formatter::V1::CSV
 
     helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
@@ -35,10 +35,7 @@ module API
         title: 'API',
         description: 'API documentation'
       },
-      produces: [
-        'application/json',
-        'application/csv'
-      ],
+      produces: ['application/json'],
       models: [
         Entity::V1::EventLog
       ]
