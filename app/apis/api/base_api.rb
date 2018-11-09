@@ -4,6 +4,7 @@ module API
     formatter :csv, Formatter::V1::CSV
 
     helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
+    helpers Helper::Pagination
 
     rescue_from Grape::Exceptions::ValidationErrors do |error|
       error!(error.message, 400)
