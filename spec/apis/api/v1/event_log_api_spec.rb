@@ -12,7 +12,9 @@ describe API::V1::EventLogAPI, type: :request do
     let(:params) do
       {
         start_date: Date.today,
-        end_date: Date.today
+        end_date: Date.today,
+        page: 1,
+        per_page: 1
       }
     end
 
@@ -27,30 +29,20 @@ describe API::V1::EventLogAPI, type: :request do
         end
       end
 
-      context 'no event log in query period' do
-        it 'returns no_content' do
-          subject
-          expect(response).to have_http_status :no_content
-        end
-      end
+      before { create(:log, resourceable: todo_list, user: user, log_tag: todo_list.log_tag) }
 
-      context 'event log exists' do
-        let!(:event_log) do
-          create(
-            :log,
-            resourceable: todo_list,
-            user: user,
-            log_tag: todo_list.log_tag,
-            action: 'create',
-            description: 'description'
-          )
-        end
+      it 'returns success and paginated event_logs' do
+        subject
+        expect(response).to have_http_status :success
 
-        it 'returns success and event logs' do
-          subject
-          expect(response).to have_http_status :success
-          expect(response.body).to eq Entity::V1::EventLog.represent([event_log]).to_json
-        end
+        collection = EventLog.where(log_tag: todo_list.log_tag).page(params[:page]).per(params[:per_page])
+        links = PaginationService.new(collection).links(request)
+        paginated_event_logs = OpenStruct.new(
+          collection: collection,
+          links: OpenStruct.new(links)
+        )
+        expected = Entity::V1::PaginatedEventLog.represent(paginated_event_logs).to_json
+        expect(response.body).to eq expected
       end
     end
 

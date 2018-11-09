@@ -20,6 +20,7 @@ describe Entity::V1::EventLog do
 
   subject { described_class.new(event_log).as_json }
 
+  it { expect(subject[:id]).to eq event_log.id }
   it { expect(subject[:todo_list_id]).to eq todo_list.id }
   it { expect(subject[:resource]).to eq event_log.resourceable_type }
   it { expect(subject[:resource_id]).to eq event_log.resourceable_id }

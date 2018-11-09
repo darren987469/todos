@@ -4,6 +4,7 @@
 ### Features
 
 * Your contribution here.
+* [#20](https://github.com/darren987469/todos/pull/20): Paginate API - [@darren987469][darren987469]
 * [#18](https://github.com/darren987469/todos/pull/18): Create, delete token pages - [@darren987469][darren987469].
 * [#17](https://github.com/darren987469/todos/pull/17): Get, update, delete token API - [@darren987469][darren987469].
 * [#16](https://github.com/darren987469/todos/pull/16): Create token API - [@darren987469][darren987469].

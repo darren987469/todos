@@ -1,9 +1,10 @@
 module API
   class BaseAPI < Grape::API
-    default_format :json
+    format :json
     formatter :csv, Formatter::V1::CSV
 
     helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
+    helpers Helper::Pagination
 
     rescue_from Grape::Exceptions::ValidationErrors do |error|
       error!(error.message, 400)
@@ -35,10 +36,7 @@ module API
         title: 'API',
         description: 'API documentation'
       },
-      produces: [
-        'application/json',
-        'application/csv'
-      ],
+      produces: ['application/json'],
       models: [
         Entity::V1::EventLog
       ]
