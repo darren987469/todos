@@ -6,21 +6,19 @@ class APIRateCounter
       @redis ||= ENV['REDIS_URL'] ? Redis.new(url: ENV['REDIS_URL']) : Redis.new
     end
 
-    def apis
-      @apis ||= {}
+    def counters
+      @counters ||= APIRateCounter::Counters.new
     end
-
-    def add(api_name, limit, period)
-      apis[api_name] ||= new(api_name, limit, period)
-    end
+    delegate :add, :get, :clear, :key, to: :counters
   end
 
-  attr_reader :api_name, :limit, :period, :count
+  attr_reader :api_name, :limit, :period, :discriminator, :count
 
-  def initialize(api_name, limit, period)
+  def initialize(api_name, limit:, period:, discriminator:)
     @api_name = api_name
     @limit = limit
     @period = period
+    @discriminator = discriminator
   end
 
   def increment(amount = 1)
@@ -44,7 +42,7 @@ class APIRateCounter
   end
 
   def key
-    "#{PREFIX}:#{api_name}"
+    "#{PREFIX}:#{api_name}:#{discriminator}"
   end
 
   def redis

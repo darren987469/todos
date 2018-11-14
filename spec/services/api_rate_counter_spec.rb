@@ -4,32 +4,11 @@ describe APIRateCounter do
   let(:limit) { 1 }
   let(:period) { 1.hour }
   let(:api_name) { 'test_api' }
-  let(:counter) { described_class.new(api_name, limit, period) }
+  let(:discriminator) { 'token_id' }
+  let(:counter_params) { [api_name, { limit: limit, period: period, discriminator: discriminator }] }
+  let(:counter) { described_class.new(*counter_params) }
 
   before { described_class.redis.flushdb }
-
-  describe '.add' do
-    context 'when api not exists' do
-      it 'creates APIRateCounter instance and returns it' do
-        counter = described_class.add(api_name, limit, period)
-
-        expect(described_class.apis).to have_key(api_name)
-        expect(described_class.apis[api_name]).to eq counter
-        expect(counter).to be_a_kind_of APIRateCounter
-      end
-    end
-
-    context 'when api exists' do
-      before { described_class.add(api_name, limit, period) }
-
-      it 'returns APIRateCounter without create new instance' do
-        expect(APIRateCounter).not_to receive(:new)
-
-        counter = described_class.add(api_name, limit, period)
-        expect(counter.api_name).to eq api_name
-      end
-    end
-  end
 
   describe '#increment' do
     it 'default increment count by 1' do
