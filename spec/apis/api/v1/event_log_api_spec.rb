@@ -19,7 +19,10 @@ describe API::V1::EventLogAPI, type: :request do
       }
     end
 
-    before { APIRateCounter.redis.flushdb }
+    before do
+      APIRateCounter.redis.flushdb
+      APIRateCounter.clear
+    end
 
     shared_examples 'GET logs API' do
       context 'invalid date range' do
@@ -64,18 +67,6 @@ describe API::V1::EventLogAPI, type: :request do
       before { sign_in user }
 
       it_behaves_like 'GET logs API'
-
-      context 'when API rate limit exceeded' do
-        before do
-          counter = APIRateCounter.add(api_name, 5000, 1.hour)
-          counter.increment(5000)
-        end
-
-        it 'won\'t affect user authenticate with session' do
-          subject
-          expect(response).to have_http_status :success
-        end
-      end
     end
 
     context 'authenticate with token' do
@@ -89,14 +80,25 @@ describe API::V1::EventLogAPI, type: :request do
       it_behaves_like 'GET logs API'
 
       context 'when API rate limit exceeded' do
+        let(:discriminator) { token.id }
+
         before do
-          counter = APIRateCounter.add(api_name, 5000, 1.hour)
+          counter = APIRateCounter.add(api_name, limit: 5000, period: 1.hour, discriminator: discriminator)
           counter.increment(5000)
         end
 
         it 'returns 429' do
           subject
           expect(response).to have_http_status 429
+        end
+
+        context 'discriminator not the same as token.id' do
+          let(:discriminator) { -1 }
+
+          it 'returns success' do
+            subject
+            expect(response).to have_http_status :success
+          end
         end
       end
     end
