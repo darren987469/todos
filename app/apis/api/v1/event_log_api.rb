@@ -3,7 +3,10 @@ module API
     class EventLogAPI < Grape::API
       helpers Helper::SharedParams
 
-      before { authenticate_user! }
+      before do
+        authenticate_user!
+        throttle('v1:event_log_api', limit: 5000, period: 1.hour)
+      end
 
       desc(
         'Get logs of TodoList',
