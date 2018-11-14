@@ -18,6 +18,10 @@ module Helper
       @token_user ||= access_token ? access_token.user : nil
     end
 
+    def token_user?
+      token_user.present?
+    end
+
     def decoded_auth_token
       @decoded_auth_token ||= auth_token.nil? ? nil : JSONWebToken.decode(auth_token)
     end
