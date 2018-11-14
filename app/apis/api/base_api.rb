@@ -4,7 +4,7 @@ module API
     formatter :csv, Formatter::V1::CSV
 
     helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
-    helpers Helper::Pagination
+    helpers Helper::Pagination, Helper::Throttle
 
     rescue_from Grape::Exceptions::ValidationErrors do |error|
       error!(error.message, 400)
@@ -20,6 +20,10 @@ module API
 
     rescue_from ActiveRecord::RecordNotFound do |_error|
       error!('Not Found.', 404)
+    end
+
+    rescue_from RateLimitExceededError do |_error|
+      error!('API rate limit exceeded.', 429)
     end
 
     if Rails.env.production? || Rails.env.staging?

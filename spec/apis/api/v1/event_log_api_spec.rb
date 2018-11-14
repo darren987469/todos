@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe API::V1::EventLogAPI, type: :request do
   describe 'GET /api/v1/todo_list/:todo_list_id/logs' do
+    let(:api_name) { 'v1:event_log_api' }
     let(:user) { create(:user1) }
     let(:todo_list) do
       create(:todo_list).tap do |todo_list|
@@ -17,6 +18,8 @@ describe API::V1::EventLogAPI, type: :request do
         per_page: 1
       }
     end
+
+    before { APIRateCounter.redis.flushdb }
 
     shared_examples 'GET logs API' do
       context 'invalid date range' do
@@ -61,6 +64,18 @@ describe API::V1::EventLogAPI, type: :request do
       before { sign_in user }
 
       it_behaves_like 'GET logs API'
+
+      context 'when API rate limit exceeded' do
+        before do
+          counter = APIRateCounter.add(api_name, 5000, 1.hour)
+          counter.increment(5000)
+        end
+
+        it 'won\'t affect user authenticate with session' do
+          subject
+          expect(response).to have_http_status :success
+        end
+      end
     end
 
     context 'authenticate with token' do
@@ -72,6 +87,18 @@ describe API::V1::EventLogAPI, type: :request do
       subject { get endpoint, params: params, headers: headers }
 
       it_behaves_like 'GET logs API'
+
+      context 'when API rate limit exceeded' do
+        before do
+          counter = APIRateCounter.add(api_name, 5000, 1.hour)
+          counter.increment(5000)
+        end
+
+        it 'returns 429' do
+          subject
+          expect(response).to have_http_status 429
+        end
+      end
     end
   end
 end
