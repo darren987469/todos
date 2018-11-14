@@ -18,6 +18,7 @@
 ### Fixes
 
 * Your contribution here.
+* [#24](https://github.com/darren987469/todos/pull/24): Add discriminator to APIRateCounter - [@darren987469][darren987469].
 * [#19](https://github.com/darren987469/todos/pull/19): Show encoded token after creating - [@darren987469][darren987469].
 
 [darren987469]: https://github.com/darren987469
