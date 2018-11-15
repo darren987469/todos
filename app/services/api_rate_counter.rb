@@ -12,7 +12,7 @@ class APIRateCounter
     delegate :add, :get, :clear, :key, to: :counters
   end
 
-  attr_reader :api_name, :limit, :period, :discriminator, :count
+  attr_reader :api_name, :limit, :period, :discriminator
 
   def initialize(api_name, limit:, period:, discriminator:)
     @api_name = api_name
@@ -29,8 +29,12 @@ class APIRateCounter
     @count
   end
 
+  def count
+    @count || 0
+  end
+
   def reset_in
-    redis.ttl(key)
+    redis.ttl(key) || period
   end
 
   def reset_at
