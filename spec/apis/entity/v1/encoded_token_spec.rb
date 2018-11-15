@@ -6,5 +6,5 @@ describe Entity::V1::EncodedToken do
 
   subject { described_class.new(token).as_json }
 
-  it { expect(subject[:encoded_token]).to eq JSONWebToken.encode(token.payload) }
+  it { expect(subject[:encoded_token]).to eq token.encoded_token }
 end

@@ -9,4 +9,8 @@ class Token < ApplicationRecord
       scopes: scopes
     }
   end
+
+  def encoded_token
+    JSONWebToken.encode(payload)
+  end
 end
