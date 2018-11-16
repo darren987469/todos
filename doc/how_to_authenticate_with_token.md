@@ -6,7 +6,7 @@
 1. Fill the description of the token, select token scopes, then generate the token.
 1. Copy the token for future API call use.
 
-![](images/generate_token.png)
+![](../images/generate_token.png)
 
 ## Step2: Authenticate user with token to call API
 
@@ -18,7 +18,7 @@
 2. Fill the token with the format `token [YOUR TOKEN]`.
 3. Try API call!
 
-![](images/authenticate_with_token.png)
+![](../images/authenticate_with_token.png)
 
 ### curl
 
