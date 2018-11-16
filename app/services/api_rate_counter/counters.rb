@@ -6,12 +6,12 @@ class APIRateCounter
       @counters = {}
     end
 
-    def add(api_name, discriminator:, **options)
+    def get_or_add(api_name:, discriminator:, **options)
       key = self.key(api_name, discriminator)
-      counters[key] ||= APIRateCounter.new(api_name, discriminator: discriminator, **options)
+      counters[key] ||= APIRateCounter.new(api_name: api_name, discriminator: discriminator, **options)
     end
 
-    def get(api_name, discriminator)
+    def get(api_name:, discriminator:)
       key = self.key(api_name, discriminator)
       counters[key]
     end

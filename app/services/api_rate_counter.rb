@@ -9,12 +9,18 @@ class APIRateCounter
     def counters
       @counters ||= APIRateCounter::Counters.new
     end
-    delegate :add, :get, :clear, :key, to: :counters
+    delegate :get_or_add, :get, :clear, :key, to: :counters
+
+    def apis
+      [
+        API::V1::EventLogAPI
+      ].freeze
+    end
   end
 
   attr_reader :api_name, :limit, :period, :discriminator
 
-  def initialize(api_name, limit:, period:, discriminator:)
+  def initialize(api_name:, limit:, period:, discriminator:)
     @api_name = api_name
     @limit = limit
     @period = period

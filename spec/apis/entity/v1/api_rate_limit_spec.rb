@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe Entity::V1::APIRateLimit do
-  let(:counter) { APIRateCounter.add('test_api', limit: 50, period: 1.hour, discriminator: 'discriminator') }
+  let(:counter_options) { { api_name: 'test_api', limit: 50, period: 1.hour, discriminator: 'discriminator' } }
+  let(:counter) { APIRateCounter.get_or_add(counter_options) }
 
   subject { described_class.new(counter).as_json }
 

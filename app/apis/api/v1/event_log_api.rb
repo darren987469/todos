@@ -3,9 +3,11 @@ module API
     class EventLogAPI < Grape::API
       helpers Helper::SharedParams
 
+      THROTTLE_SETTINGS = { api_name: 'v1:event_log_api', limit: 5000, period: 1.hour }.freeze
+
       before do
         authenticate_user!
-        throttle('v1:event_log_api', limit: 5000, period: 1.hour)
+        throttle(THROTTLE_SETTINGS)
       end
 
       desc(

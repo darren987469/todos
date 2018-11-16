@@ -5,31 +5,31 @@ describe APIRateCounter::Counters do
   let(:period) { 1.hour }
   let(:api_name) { 'test_api' }
   let(:discriminator) { 'token_id' }
-  let(:counter_params) { [api_name, { limit: limit, period: period, discriminator: discriminator }] }
+  let(:counter_params) { { api_name: api_name, limit: limit, period: period, discriminator: discriminator } }
   let(:counters) { described_class.new }
 
-  describe '#add' do
+  describe '#get_or_add' do
     context 'when counter not exists' do
       it 'creates APIRateCounter instance and returns it' do
-        counter = counters.add(*counter_params)
+        counter = counters.get_or_add(counter_params)
         expect(counter).to be_a_kind_of APIRateCounter
       end
     end
 
     context 'when counter exists' do
-      let!(:counter) { counters.add(*counter_params) }
+      let!(:counter) { counters.get_or_add(counter_params) }
 
       it 'returns APIRateCounter without create new instance' do
         expect(APIRateCounter).not_to receive(:new)
 
-        subject = counters.add(*counter_params)
+        subject = counters.get_or_add(counter_params)
         expect(subject).to eq counter
       end
     end
   end
 
   describe '#get' do
-    subject { counters.get(api_name, discriminator) }
+    subject { counters.get(api_name: api_name, discriminator: discriminator) }
 
     context 'counter not exists' do
       it 'returns nil' do
@@ -38,7 +38,7 @@ describe APIRateCounter::Counters do
     end
 
     context 'counter exists' do
-      let!(:counter) { counters.add(*counter_params) }
+      let!(:counter) { counters.get_or_add(counter_params) }
 
       it 'returns counter' do
         expect(subject).to eq counter
