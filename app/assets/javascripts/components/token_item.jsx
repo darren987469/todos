@@ -2,7 +2,7 @@ function TokenItem(props) {
   const { token } = props
   const description = token.encoded_token ? token.encoded_token : `${ token.note } - ${ token.scopes.join(', ') }`
   return(
-    <div className="dd-handle">
+    <div className="dd-handle" style={{ wordBreak: 'break-all' }}>
       { description }
       <div className="pull-right action-buttons">
         <a className="red" onClick={ ()=>{ props.deleteTokenRequest(token.id) } }>
