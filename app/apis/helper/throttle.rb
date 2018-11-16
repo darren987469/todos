@@ -1,10 +1,11 @@
 module Helper
   module Throttle
-    def throttle(api_name, **options)
+    def throttle(settings)
       return unless token_user?
 
-      limit = options[:limit]
-      counter = APIRateCounter.add(api_name, discriminator: access_token.id, **options)
+      limit = settings[:limit]
+      options = settings.merge(discriminator: access_token.id)
+      counter = APIRateCounter.get_or_add(options)
       count = counter.increment
 
       return unless count > limit

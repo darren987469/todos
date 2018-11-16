@@ -19,6 +19,8 @@ Detail spec can be found in [System Spec](system_spec.md)
 Production:  https://todos-actioncable.herokuapp.com/swagger
 Development: http://localhost:3000/swagger
 
+[How to authenticate with token guide](doc/how_to_authenticate_with_token.md)
+
 ## Potential bottleneck and todos
 
 The bottleneck of this app maybe rails action cable. It has poor performance when handle a large number of client.

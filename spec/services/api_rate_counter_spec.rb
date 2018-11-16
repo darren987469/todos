@@ -5,8 +5,8 @@ describe APIRateCounter do
   let(:period) { 1.hour }
   let(:api_name) { 'test_api' }
   let(:discriminator) { 'token_id' }
-  let(:counter_params) { [api_name, { limit: limit, period: period, discriminator: discriminator }] }
-  let(:counter) { described_class.new(*counter_params) }
+  let(:counter_params) { { api_name: api_name, limit: limit, period: period, discriminator: discriminator } }
+  let(:counter) { described_class.new(counter_params) }
 
   before { described_class.redis.flushdb }
 

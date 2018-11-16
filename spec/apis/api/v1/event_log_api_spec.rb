@@ -83,7 +83,8 @@ describe API::V1::EventLogAPI, type: :request do
         let(:discriminator) { token.id }
 
         before do
-          counter = APIRateCounter.add(api_name, limit: 5000, period: 1.hour, discriminator: discriminator)
+          counter_options = { api_name: api_name, limit: 5000, period: 1.hour, discriminator: discriminator }
+          counter = APIRateCounter.get_or_add(counter_options)
           counter.increment(5000)
         end
 
