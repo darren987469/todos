@@ -5,7 +5,8 @@ module API
 
       desc(
         'Get rate limit status',
-        success: Entity::V1::APIRateLimit
+        success: Entity::V1::APIRateLimit,
+        is_array: true
       )
       get 'rate_limit' do
         error!('Only user authenticated with token has rate limit.', 403) unless token_user?
@@ -14,12 +15,8 @@ module API
         counters = APIRateCounter.apis.map do |api_class|
           settings = api_class.const_get(:THROTTLE_SETTINGS)
 
-          counter = APIRateCounter.counters.get(settings[:api_name], discriminator)
-          counter ||= OpenStruct.new(
-            limit: settings[:limit],
-            remaining: settings[:limit],
-            reset_at: Time.current + settings[:period]
-          )
+          counter_options = settings.merge(discriminator: discriminator)
+          APIRateCounter.counters.get_or_add(counter_options)
         end
 
         present counters, with: Entity::V1::APIRateLimit
