@@ -1,9 +1,18 @@
-## 0.1.0 (Next)
+## 0.2.0 (Next)
 <!-- [Full Changelog](https://github.com/darren987469/todos/compare/...) -->
 
 ### Features
 
 * Your contribution here.
+
+### Fixes
+
+* Your contribution here.
+
+## 0.1.0 (2018/11/16)
+
+### Features
+
 * [#25](https://github.com/darren987469/todos/pull/25): Rate limit API - [@darren987469][darren987469]
 * [#22](https://github.com/darren987469/todos/pull/22): API rate limit - [@darren987469][darren987469]
 * [#20](https://github.com/darren987469/todos/pull/20): Paginate API - [@darren987469][darren987469]
@@ -18,7 +27,6 @@
 
 ### Fixes
 
-* Your contribution here.
 * [#24](https://github.com/darren987469/todos/pull/24): Add discriminator to APIRateCounter - [@darren987469][darren987469].
 * [#19](https://github.com/darren987469/todos/pull/19): Show encoded token after creating - [@darren987469][darren987469].
 
