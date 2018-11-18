@@ -1,16 +1,15 @@
 module API
   module V1
     class RateLimitAPI < Grape::API
-      before { authenticate_user! }
+      before { token_authenticate! }
 
       desc(
         'Get rate limit status',
+        tags: ['Public API'],
         success: Entity::V1::APIRateLimit,
         is_array: true
       )
       get 'rate_limit' do
-        error!('Only user authenticated with token has rate limit.', 403) unless token_user?
-
         discriminator = access_token.id
         counters = APIRateCounter.apis.map do |api_class|
           settings = api_class.const_get(:THROTTLE_SETTINGS)

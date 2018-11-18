@@ -35,6 +35,12 @@ module API
     mount API::V1::BaseAPI => '/v1'
 
     add_swagger_documentation(
+      tags: [
+        { name: 'Internal API', description: 'API for internal use. Authenticate with session.' },
+        { name: 'Public API', description: 'Authenticate with token.' }
+      ],
+      hide_documentation_path: true,
+      api_documentation: { desc: 'ttt desc' },
       mount_path: '/swagger_doc',
       info: {
         title: 'API',

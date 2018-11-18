@@ -24,7 +24,34 @@ describe API::V1::EventLogAPI, type: :request do
       APIRateCounter.clear
     end
 
-    shared_examples 'GET logs API' do
+    context 'unauthenticate' do
+      subject { get endpoint, params: params }
+
+      it 'returns 401' do
+        subject
+        expect(response).to have_http_status 401
+      end
+    end
+
+    context 'authenticate with session' do
+      subject { get endpoint, params: params }
+
+      before { sign_in user }
+
+      it 'returns 401' do
+        subject
+        expect(response).to have_http_status 401
+      end
+    end
+
+    context 'authenticate with token' do
+      let(:token) { create(:token, user: user) }
+      let(:payload) { { id: token.id } }
+      let(:access_token) { JSONWebToken.encode(payload) }
+      let(:headers) { { 'Authorization' => "token #{access_token}" } }
+
+      subject { get endpoint, params: params, headers: headers }
+
       context 'invalid date range' do
         it 'returns bad_request' do
           params[:start_date] = Date.today
@@ -50,34 +77,6 @@ describe API::V1::EventLogAPI, type: :request do
         expected = Entity::V1::PaginatedEventLog.represent(paginated_event_logs).to_json
         expect(response.body).to eq expected
       end
-    end
-
-    context 'unauthenticate' do
-      subject { get endpoint, params: params }
-
-      it 'returns 401' do
-        subject
-        expect(response).to have_http_status 401
-      end
-    end
-
-    context 'authenticate with session' do
-      subject { get endpoint, params: params }
-
-      before { sign_in user }
-
-      it_behaves_like 'GET logs API'
-    end
-
-    context 'authenticate with token' do
-      let(:token) { create(:token, user: user) }
-      let(:payload) { { id: token.id } }
-      let(:access_token) { JSONWebToken.encode(payload) }
-      let(:headers) { { 'Authorization' => "token #{access_token}" } }
-
-      subject { get endpoint, params: params, headers: headers }
-
-      it_behaves_like 'GET logs API'
 
       context 'when API rate limit exceeded' do
         let(:discriminator) { token.id }

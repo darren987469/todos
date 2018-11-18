@@ -17,9 +17,9 @@ describe API::V1::RateLimitAPI, type: :request do
 
       before { sign_in user }
 
-      it 'returns 403' do
+      it 'returns 401' do
         subject
-        expect(response).to have_http_status :forbidden
+        expect(response).to have_http_status 401
       end
     end
 
