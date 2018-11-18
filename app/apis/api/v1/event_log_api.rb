@@ -20,6 +20,8 @@ module API
         use :period, :pagination
       end
       get 'todo_list/:todo_lis_id/logs' do
+        authorize_with_token('read:log')
+
         start_date = params[:start_date].beginning_of_day
         end_date = params[:end_date].end_of_day
         error!('Invalid date range.', 400) unless end_date > start_date

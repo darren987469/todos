@@ -3,7 +3,8 @@ module API
     format :json
     formatter :csv, Formatter::V1::CSV
 
-    helpers Helper::Base, Helper::Devise, Helper::TokenAuthenticate
+    helpers Helper::Base, Helper::Devise
+    helpers Helper::TokenAuthenticate, Helper::TokenAuthorize
     helpers Helper::Pagination, Helper::Throttle
 
     rescue_from Grape::Exceptions::ValidationErrors do |error|
