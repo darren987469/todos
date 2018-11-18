@@ -8,6 +8,8 @@ module Helper
 
     def token_authenticate!
       access_token || (raise NotAuthenticatedError)
+      @current_user ||= token_user
+      access_token
     end
 
     def access_token

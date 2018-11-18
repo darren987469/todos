@@ -34,6 +34,11 @@ describe Helper::TokenAuthenticate do
         expect(subject).to eq access_token
         expect(instance.access_token).to eq access_token
       end
+
+      it 'sets @current_user' do
+        subject
+        expect(instance.instance_variable_get(:@current_user)).to eq user
+      end
     end
   end
 

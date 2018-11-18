@@ -5,7 +5,7 @@ module Helper
     end
 
     def current_user
-      devise_user || token_user
+      @current_user || devise_user
     end
   end
 end

@@ -6,13 +6,13 @@ module API
       THROTTLE_SETTINGS = { api_name: 'v1:event_log_api', limit: 5000, period: 1.hour }.freeze
 
       before do
-        authenticate_user!
+        token_authenticate!
         throttle(THROTTLE_SETTINGS)
       end
 
       desc(
         'Get logs of TodoList',
-        tags: ['logs'],
+        tags: ['Public API'],
         success: Entity::V1::PaginatedEventLog,
         is_array: true
       )

@@ -6,7 +6,7 @@ module API
       resource 'tokens' do
         desc(
           'Get tokens',
-          tags: ['tokens'],
+          tags: ['Internal API'],
           success: Entity::V1::Token,
           is_array: true
         )
@@ -18,7 +18,7 @@ module API
 
         desc(
           'Get token',
-          tags: ['tokens'],
+          tags: ['Internal API'],
           success: Entity::V1::Token
         )
         get ':id' do
@@ -29,7 +29,7 @@ module API
 
         desc(
           'Create token',
-          tags: ['tokens'],
+          tags: ['Internal API'],
           success: Entity::V1::EncodedToken
         )
         params do
@@ -46,7 +46,7 @@ module API
 
         desc(
           'Update token',
-          tags: ['tokens'],
+          tags: ['Internal API'],
           success: Entity::V1::Token
         )
         params do
@@ -66,7 +66,7 @@ module API
 
         desc(
           'Delete token',
-          tags: ['tokens'],
+          tags: ['Internal API'],
           success: Entity::V1::EncodedToken
         )
         delete ':id' do
