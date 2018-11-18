@@ -45,12 +45,21 @@ describe API::V1::EventLogAPI, type: :request do
     end
 
     context 'authenticate with token' do
-      let(:token) { create(:token, user: user) }
+      let(:token) { create(:token, user: user, scopes: ['read:log']) }
       let(:payload) { { id: token.id } }
       let(:access_token) { JSONWebToken.encode(payload) }
       let(:headers) { { 'Authorization' => "token #{access_token}" } }
 
       subject { get endpoint, params: params, headers: headers }
+
+      context 'when not authorized in token scopes' do
+        let(:token) { create(:token, user: user, scopes: []) }
+
+        it 'returns 403' do
+          subject
+          expect(response).to have_http_status 403
+        end
+      end
 
       context 'invalid date range' do
         it 'returns bad_request' do
