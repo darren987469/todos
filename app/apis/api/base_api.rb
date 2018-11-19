@@ -45,7 +45,7 @@ module API
       mount_path: '/swagger_doc',
       info: {
         title: 'API',
-        description: 'API documentation'
+        description: 'Authenticate with token guide: https://github.com/darren987469/todos/blob/master/doc/how_to_authenticate_with_token.md.'
       },
       produces: ['application/json'],
       models: [
