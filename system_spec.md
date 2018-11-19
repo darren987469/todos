@@ -6,7 +6,8 @@
 * User views/creates/edits/deletes/invites member to TodoList
 * User creates/edits/deletes/archives Todo
 * User views EventLog
-* User searches Todo #1
+* User views/creates/deletes access token
+* Application developer accesses resource through API
 
 ## Constraints and assumptions
 
@@ -15,7 +16,6 @@
 * 1 million active users
 * 10 million new todos per day
 * 50 million read requests per day
-* 10 million searches per day
 
 Calculate usage
 
@@ -34,7 +34,6 @@ Calculate usage
   * 365 GB per year
 * 58 read requests per second
 * 12 new todo requests per second
-* 12 search requests per second
 
 ## High-level design
 
@@ -42,6 +41,8 @@ Calculate usage
 https://www.draw.io/#G1KF_OIeRQkhsfWZajTnZKSdSzXj5QHsyt
 
 Actions such as CRUD of `Todo` and create/delete of `TodoList` should update immediately to users. `WebSocket Service` handles those actions. Other actions can be done by `Read/Write API`.
+
+Redis handles cache and high volume reads/writes. For example, API throttling data is saved in redis.
 
 ## Database schema
 
@@ -59,3 +60,17 @@ invite member to TodoList| X | V | V
 delete TodoList| X | X | V
 
 `EventLog` is used to record every action of a user. Such as user creates `TodoList`, user updates `Todo` or user invites a member to `TodoList`.
+
+`Token` records scopes the user authorized to application developer. Scopes format is `[action]:[resource]`, such as `read:log`, `write:log`.
+
+## Potential bottleneck and TODOs
+
+The bottleneck of this app maybe rails action cable. It has poor performance when handle a large number of client.
+
+* Use Background job to reduce response time in controller caused by action cable broadcast.
+* Separate websocket server and application server instead of just using one server. Avoid app server from being affected by slow websocket.
+* If allowed, rewrite websocket server in another language such as Go, Erlang is better choice. Ruby on Rails is not fit for scalable concurrent applications. There is a open source project [AnyCable Rails](https://github.com/anycable/anycable-rails) do this.
+
+References:
+* [Action Cable 即時通訊](https://ihower.tw/rails/actioncable.html) by ihower
+* [AnyCable: Action Cable on steroids](https://evilmartians.com/chronicles/anycable-actioncable-on-steroids) by Vladimir Dementyev
