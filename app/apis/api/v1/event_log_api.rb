@@ -13,8 +13,7 @@ module API
       desc(
         'Get logs of TodoList',
         tags: ['Public API'],
-        success: Entity::V1::PaginatedEventLog,
-        is_array: true
+        success: Entity::V1::PaginatedEventLog
       )
       params do
         use :period, :pagination
