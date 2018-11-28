@@ -4,7 +4,7 @@ module Helper
       return unless token_user?
 
       limit = settings[:limit]
-      options = settings.merge(discriminator: access_token.id)
+      options = settings.merge(discriminator: access_token.user_id)
       counter = APIRateCounter.get_or_add(options)
       count = counter.increment
 

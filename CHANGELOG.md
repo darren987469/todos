@@ -9,6 +9,7 @@
 ### Fixes
 
 * Your contribution here.
+* [#30](https://github.com/darren987469/todos/pull/30): Limit API rate by token user - [@darren987469][darren987469]
 * [#27](https://github.com/darren987469/todos/pull/27): Separate internal, public API - [@darren987469][darren987469]
 
 ## 0.1.0 (2018/11/16)

@@ -88,7 +88,7 @@ describe API::V1::EventLogAPI, type: :request do
       end
 
       context 'when API rate limit exceeded' do
-        let(:discriminator) { token.id }
+        let(:discriminator) { token.user_id }
 
         before do
           counter_options = { api_name: api_name, limit: 5000, period: 1.hour, discriminator: discriminator }
