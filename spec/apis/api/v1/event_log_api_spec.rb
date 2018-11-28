@@ -18,6 +18,7 @@ describe API::V1::EventLogAPI, type: :request do
         per_page: 1
       }
     end
+    let(:discriminator) { token.user_id }
 
     before do
       APIRateCounter.redis.flushdb
@@ -87,9 +88,17 @@ describe API::V1::EventLogAPI, type: :request do
         expect(response.body).to eq expected
       end
 
-      context 'when API rate limit exceeded' do
-        let(:discriminator) { token.user_id }
+      it 'returns rate limit information in header' do
+        subject
 
+        counter = APIRateCounter.get_or_add(api_name: api_name, discriminator: discriminator)
+        headers = response.headers
+        expect(headers['X-RateLimit-Limit']).to eq counter.limit
+        expect(headers['X-RateLimit-Remaining']).to eq counter.remaining
+        expect(headers['X-RateLimit-Reset']).to eq counter.reset_at.to_i
+      end
+
+      context 'when API rate limit exceeded' do
         before do
           counter_options = { api_name: api_name, limit: 5000, period: 1.hour, discriminator: discriminator }
           counter = APIRateCounter.get_or_add(counter_options)

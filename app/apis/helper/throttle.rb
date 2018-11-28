@@ -8,13 +8,11 @@ module Helper
       counter = APIRateCounter.get_or_add(options)
       count = counter.increment
 
-      return unless count > limit
-
       header('X-RateLimit-Limit', limit)
       header('X-RateLimit-Remaining', counter.remaining)
       header('X-RateLimit-Reset', counter.reset_at.to_i)
 
-      raise RateLimitExceededError
+      raise RateLimitExceededError if count > limit
     end
   end
 end
