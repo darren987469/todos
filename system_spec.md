@@ -74,3 +74,7 @@ The bottleneck of this app maybe rails action cable. It has poor performance whe
 References:
 * [Action Cable 即時通訊](https://ihower.tw/rails/actioncable.html) by ihower
 * [AnyCable: Action Cable on steroids](https://evilmartians.com/chronicles/anycable-actioncable-on-steroids) by Vladimir Dementyev
+
+## API spec
+
+See [API reference](doc/api_reference.md)
