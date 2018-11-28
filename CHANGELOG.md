@@ -9,6 +9,7 @@
 ### Fixes
 
 * Your contribution here.
+* [#31](https://github.com/darren987469/todos/pull/31): Fix rate limit info in response header - [@darren987469][darren987469]
 * [#30](https://github.com/darren987469/todos/pull/30): Limit API rate by token user - [@darren987469][darren987469]
 * [#27](https://github.com/darren987469/todos/pull/27): Separate internal, public API - [@darren987469][darren987469]
 
