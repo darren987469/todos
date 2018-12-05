@@ -40,16 +40,16 @@ Calculate usage
 ![](images/high_level_design.png)
 https://www.draw.io/#G1KF_OIeRQkhsfWZajTnZKSdSzXj5QHsyt
 
-Actions such as CRUD of `Todo` and create/delete of `TodoList` should update immediately to users. `WebSocket Service` handles those actions. Other actions can be done by `Read/Write API`.
+Some information should notify user immediately, such as CRUD of `Todo` and create/delete of `TodoList`. We use `Websocket Service` to handle those actions. Other actions are handled by `Read/Writer API`.
 
-Redis handles cache and high volume reads/writes. For example, API throttling data is saved in redis.
+We use `Redis` to handle cache and high volume reads/writes. For example, API throttling data, which records API request rate per user, is stored in redis.
 
 ## Database schema
 
 ![](images/database_schema.png)
 https://www.draw.io/#G1Wwmv8O3JBPwBJYDkv_3AvkWu05YHC4m2
 
-`User` has many `TodoList` through `TodoListship`. There are three roles: owner, admin, and user.
+`User` has many `TodoList` through `TodoListship`. There are three roles: owner, admin, and user. Each role has different permissions:
 
 Role | user | admin | owner
 -------------- | ------|-------|-----
