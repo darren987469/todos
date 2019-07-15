@@ -20,6 +20,8 @@ Detail spec can be found in [System Spec](system_spec.md)
 Production:  https://todos-actioncable.herokuapp.com/swagger
 Development: http://localhost:3000/swagger
 
+There are two kinds of API: internal and public. Internal API is for internal use and public API is exposed to let 3rd party to integrate. User can generate token with granted permissions and use it to call public API.
+
 [How to authenticate with token guide](doc/how_to_authenticate_with_token.md)
 
 ## Environment
